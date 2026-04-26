@@ -1,60 +1,135 @@
-# 📦 Collection Tracker
+# TF Tracker 🤖
 
-> A clean way to track everything you collect.
+A local web app for tracking your Transformers figure collection — accessories, completion status, photos and all.
 
-Collection Tracker is a simple but powerful app for organizing any type of personal collection.  
-From action figures, trading cards, and sneakers to vinyl records or random collectibles — everything stays in one place, organized and easy to access.
+Built for collectors who want full control of their data without cloud services or subscriptions.
 
-Built for collectors who want clarity instead of chaos.
-
----
-
-## 🚀 What it does
-
-- Add items to your personal collection  
-- Organize by category (figures, cards, sneakers, etc.)  
-- Track details like condition, notes, and ownership status  
-- Separate what you own vs what you’re still hunting for  
-- View your entire collection in a clean, simple interface  
+![Transformers G1](https://img.shields.io/badge/Generations-G1%20to%20TR-red?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat-square)
+![Flask](https://img.shields.io/badge/Flask-local-green?style=flat-square)
 
 ---
 
-## 🧠 Why this exists
+## Features
 
-Most collectors end up using spreadsheets, notes, or memory.
-
-This app replaces all of that with something built specifically for collectors — fast, structured, and actually enjoyable to use.
-
----
-
-## 🛠 Tech Stack
-
-(Add yours here)
-
-- React / Next.js  
-- TypeScript  
-- Tailwind CSS  
-- Firebase / Supabase (if used)  
+- **18 series** pre-loaded — G1 through Titans Return (2,600+ figures)
+- Track accessories and parts per figure (have / missing)
+- Upload photos for each figure and accessory
+- Filter by faction (Autobot / Decepticon), status, type
+- Sidebar navigation between collections
+- PDF export per series
+- 100% local — no internet required after setup
 
 ---
 
-## 📌 Status
+## Requirements
 
-This project is currently in active development.  
-Built as a learning project and evolved through rapid iteration and vibe coding.
-
-Expect changes, experiments, and improvements over time.
+- Python 3.8 or newer
+- Works on Windows, macOS, Linux
 
 ---
 
-## 💡 Vision
+## Installation
 
-The goal is to make the simplest possible tool for managing collections — without unnecessary complexity.
+### 1. Clone the repo
 
-No clutter. No overengineering. Just your collection.
+```bash
+git clone https://github.com/YOUR_USERNAME/tf-tracker.git
+cd tf-tracker
+```
+
+### 2. Install dependencies
+
+```bash
+pip install flask reportlab
+```
+
+### 3. Populate the database
+
+```bash
+python seed.py
+```
+
+Answer `yes` when prompted. This creates `tracker.db` with all figures across all 18 series.
+
+### 4. Start the app
+
+**Windows** — double-click `TF Tracker.bat`
+
+**Mac / Linux:**
+```bash
+python app.py
+```
+
+The browser opens automatically at `http://localhost:5000`
 
 ---
 
-## 📄 License
+## Project structure
 
-MIT
+```
+tf-tracker/
+├── app.py          # Flask backend — all API routes
+├── index.html      # Frontend — the full UI in one file
+├── seed.py         # One-time database seeder
+├── requirements.txt
+├── tracker.db      # Your collection data (created by seed.py, gitignored)
+└── images/         # Uploaded photos (gitignored)
+```
+
+---
+
+## Backup
+
+Your data lives in two places. Copy both to back up:
+
+| What | Where |
+|------|-------|
+| All figures, accessories, status | `tracker.db` |
+| All uploaded photos | `images/` folder |
+
+> `tracker.db` and `images/` are excluded from git — your collection stays private.
+
+---
+
+## Series included
+
+| Series | Short | Years | Figures |
+|--------|-------|-------|---------|
+| Generation 1 | G1 | 1984–1990 | 344 |
+| Generation 2 | G2 | 1993–1995 | 93 |
+| Beast Wars | BW | 1996–2001 | 114 |
+| Beast Machines | BM | 2000–2001 | 61 |
+| Robots in Disguise | RID01 | 2001–2003 | 73 |
+| Armada | ARM | 2002–2003 | 64 |
+| Energon | ENE | 2003–2005 | 84 |
+| Cybertron | CYB | 2005–2006 | 118 |
+| Movie (2007) | MOV1 | 2007–2008 | 194 |
+| Animated | ANI | 2008–2010 | 88 |
+| Movie – ROTF | ROTF | 2007–2010 | 213 |
+| Movie – DOTM | DOTM | 2011–2012 | 154 |
+| Prime | PRI | 2011–2020 | 166 |
+| Movie – AOE | AOE | 2013–2014 | 87 |
+| Robots in Disguise 2015 | RID15 | 2015–2017 | 290 |
+| Movie – TLK | TLK | 2017–2018 | 104 |
+| Combiner Wars | CW | 2015–2018 | 73 |
+| Titans Return | TR | 2016–2018 | 76 |
+
+---
+
+## Contributing
+
+Pull requests welcome! Useful contributions:
+
+- Missing figures or accessories
+- Bug fixes
+- UI improvements
+- Additional series (Power of the Primes, War for Cybertron etc.)
+
+Please open an issue before starting larger changes.
+
+---
+
+## License
+
+MIT — free to use, modify and distribute.
