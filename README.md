@@ -4,7 +4,6 @@ A local web app for tracking your Transformers figure collection — accessories
 
 ![TF Tracker screenshot](assets/screenshot.png)
 
-
 Built for collectors who want full control of their data without cloud services or subscriptions.
 
 ![Transformers G1](https://img.shields.io/badge/Generations-G1%20to%20TR-red?style=flat-square)
@@ -34,32 +33,46 @@ Built for collectors who want full control of their data without cloud services 
 
 ## Installation
 
-### 1. Clone the repo
+### Option A — One-click installer (recommended)
 
+**Windows:**
+1. Download or clone the repo
+2. Double-click `install.bat`
+3. Done — the app opens automatically
+
+**macOS / Linux:**
+```bash
+bash install.sh
+```
+
+The installer checks Python, installs dependencies, seeds the database and creates a desktop shortcut.
+
+---
+
+### Option B — Manual
+
+**1. Clone the repo**
 ```bash
 git clone https://github.com/Rubotnic/tf-tracker.git
 cd tf-tracker
 ```
 
-### 2. Install dependencies
-
+**2. Install dependencies**
 ```bash
 pip install flask reportlab
 ```
 
-### 3. Populate the database
-
+**3. Populate the database**
 ```bash
 python seed.py
 ```
-
 Answer `yes` when prompted. This creates `tracker.db` with all figures across all 18 series.
 
-### 4. Start the app
+**4. Start the app**
 
-**Windows** — double-click `TF Tracker.bat`
+Windows — double-click `TF Tracker.bat`
 
-**Mac / Linux:**
+macOS / Linux:
 ```bash
 python app.py
 ```
@@ -72,12 +85,14 @@ The browser opens automatically at `http://localhost:5000`
 
 ```
 tf-tracker/
-├── app.py          # Flask backend — all API routes
-├── index.html      # Frontend — the full UI in one file
-├── seed.py         # One-time database seeder
+├── app.py            # Flask backend — all API routes
+├── index.html        # Frontend — the full UI in one file
+├── seed.py           # One-time database seeder
+├── install.bat       # One-click installer for Windows
+├── install.sh        # One-click installer for macOS / Linux
 ├── requirements.txt
-├── tracker.db      # Your collection data (created by seed.py, gitignored)
-└── images/         # Uploaded photos (gitignored)
+├── tracker.db        # Your collection data
+└── images/           # Uploaded photos
 ```
 
 ---
@@ -90,8 +105,6 @@ Your data lives in two places. Copy both to back up:
 |------|-------|
 | All figures, accessories, status | `tracker.db` |
 | All uploaded photos | `images/` folder |
-
-> `tracker.db` and `images/` are excluded from git — your collection stays private.
 
 ---
 
