@@ -26,85 +26,66 @@ Built for collectors who want full control of their data without cloud services 
 
 ## Requirements
 
-- Python 3.8 or newer
-- Works on Windows, macOS, Linux
+Before you start, you need **Python** installed on your computer.
+
+👉 Download Python here: https://www.python.org/downloads/
+
+> **Important:** During installation, check the box that says **"Add Python to PATH"**
 
 ---
 
 ## Installation
 
-### Option A — One-click installer (recommended)
+### Windows
 
-**Windows:**
-1. Download or clone the repo
-2. Double-click `install.bat`
-3. Done — the app opens automatically
+1. Download this project — click the green **Code** button above, then **Download ZIP**
+2. Unzip the folder somewhere on your computer (e.g. your Desktop)
+3. Open the folder and double-click **`install.bat`**
+4. The installer will set everything up automatically
+5. When it's done, click **j** to launch the app — it opens in your browser
 
-**macOS / Linux:**
+That's it. A shortcut called **TF Tracker** is also created on your Desktop for next time.
+
+---
+
+### macOS / Linux
+
+1. Download this project — click the green **Code** button above, then **Download ZIP**
+2. Unzip the folder and open Terminal inside it
+3. Run:
 ```bash
 bash install.sh
 ```
-
-The installer checks Python, installs dependencies, seeds the database and creates a desktop shortcut.
-
----
-
-### Option B — Manual
-
-**1. Clone the repo**
-```bash
-git clone https://github.com/Rubotnic/tf-tracker.git
-cd tf-tracker
-```
-
-**2. Install dependencies**
-```bash
-pip install flask reportlab
-```
-
-**3. Populate the database**
-```bash
-python seed.py
-```
-Answer `yes` when prompted. This creates `tracker.db` with all figures across all 18 series.
-
-**4. Start the app**
-
-Windows — double-click `TF Tracker.bat`
-
-macOS / Linux:
-```bash
-python app.py
-```
-
-The browser opens automatically at `http://localhost:5000`
+4. The app opens automatically at http://localhost:5000
 
 ---
 
-## Project structure
+### Starting the app after installation
 
-```
-tf-tracker/
-├── app.py            # Flask backend — all API routes
-├── index.html        # Frontend — the full UI in one file
-├── seed.py           # One-time database seeder
-├── install.bat       # One-click installer for Windows
-├── install.sh        # One-click installer for macOS / Linux
-├── requirements.txt
-├── tracker.db        # Your collection data
-└── images/           # Uploaded photos
-```
+**Windows** — double-click **`TF Tracker.bat`** (or use the Desktop shortcut)
+
+**macOS / Linux** — run `python app.py` in the project folder
 
 ---
 
-## Backup
+### Shutting down the app
 
-Your data lives in two places. Copy both to back up:
+Click the **⏻** button in the top right corner of the app, or press **Ctrl+C** in the terminal window.
+
+---
+
+## Your data
+
+All your collection data is stored locally on your computer — nothing is sent online.
 
 | What | Where |
 |------|-------|
 | All figures, accessories, status | `tracker.db` |
 | All uploaded photos | `images/` folder |
+
+> **Backup tip:** Copy both `tracker.db` and the `images/` folder to keep your collection safe.
+
+> If you ever delete `tracker.db` by mistake, run `python seed.py` to recreate it with all figures.
 
 ---
 
