@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TF TRACKER</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:#CC1100;--red2:#FF3300;--red-glow:rgba(204,17,0,0.5);
+  --gold:#FFB800;--gold2:#FFE080;
+  --blue:#1144BB;--blue2:#4488FF;
+  --purple:#6600CC;--purple2:#AA44FF;--purple-glow:rgba(102,0,204,0.5);
+  --black:#04040A;--dark:#080810;--surface:#0D0D18;
+  --card:#111120;--card2:#161628;
+  --border:#1E1E35;--border2:#2A2A48;
+  --text:#E0DCF0;--muted:#55536A;
+  --green:#00CC55;--green2:#00FF66;
+  --autobot:#0044BB;--decepticon:#6600CC;
+  --sidebar-w:220px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Rajdhani',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(1px 1px at 12% 8%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 28% 14%,rgba(255,255,255,.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 45% 6%,rgba(255,255,255,.45) 0%,transparent 100%),
+    radial-gradient(1px 1px at 62% 18%,rgba(255,255,255,.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 78% 9%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 88% 22%,rgba(255,255,255,.35) 0%,transparent 100%),
+    radial-gradient(2px 2px at 18% 28%,rgba(255,255,255,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 52% 32%,rgba(255,255,255,.2) 0%,transparent 100%),
+    radial-gradient(ellipse 55% 35% at 15% 18%,rgba(170,20,0,.2) 0%,transparent 70%),
+    radial-gradient(ellipse 55% 35% at 85% 18%,rgba(90,0,170,.17) 0%,transparent 70%),
+    linear-gradient(180deg,#04040A 0%,#06060F 40%,#080810 100%);
+  pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;bottom:0;left:0;right:0;height:40vh;z-index:0;
+  background:
+    repeating-linear-gradient(90deg,transparent,transparent calc(100%/20 - 1px),rgba(160,40,0,.1) calc(100%/20 - 1px),rgba(160,40,0,.1) calc(100%/20)),
+    repeating-linear-gradient(0deg,transparent,transparent 36px,rgba(160,40,0,.07) 36px,rgba(160,40,0,.07) 37px);
+  mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.5) 30%,black 100%);
+  pointer-events:none;
+  transform:perspective(400px) rotateX(35deg);
+  transform-origin:bottom center;
+}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--dark);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--red),var(--purple));border-radius:2px;}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh;}
+
+/* ── HEADER ─────────────────────────────────────────────────────────────── */
+header{
+  position:relative;z-index:100;flex-shrink:0;
+  background:linear-gradient(180deg,rgba(8,4,20,.98) 0%,rgba(10,5,22,.95) 100%);
+  border-bottom:1px solid var(--border2);
+  padding:0 14px;
+  display:flex;align-items:center;gap:10px;height:56px;
+}
+header::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 40% 100% at 0% 50%,rgba(204,17,0,.1) 0%,transparent 100%),
+    radial-gradient(ellipse 40% 100% at 100% 50%,rgba(102,0,204,.1) 0%,transparent 100%);
+  pointer-events:none;
+}
+header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red) 20%,var(--gold) 50%,var(--purple) 80%,transparent);
+  opacity:.6;
+}
+.header-logo{
+  width:40px;height:40px;flex-shrink:0;border-radius:3px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface);border:1px solid var(--border2);
+  cursor:pointer;position:relative;transition:border-color .2s;z-index:1;
+}
+.header-logo:hover{border-color:var(--gold);}
+.header-logo img{width:100%;height:100%;object-fit:cover;}
+.header-logo-placeholder{font-size:20px;opacity:.25;}
+.logo-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.8);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s;
+  font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--gold);letter-spacing:2px;
+}
+.header-logo:hover .logo-overlay{opacity:1;}
+.header-title{font-family:'Bebas Neue',sans-serif;letter-spacing:5px;line-height:1;white-space:nowrap;flex-shrink:0;z-index:1;}
+.header-title .tf{font-size:26px;color:var(--red2);text-shadow:0 0 20px var(--red-glow);}
+.header-title .g1{font-size:26px;color:var(--gold);text-shadow:0 0 15px rgba(255,184,0,.4);margin:0 4px;}
+.header-title .tracker{font-size:26px;color:var(--purple2);text-shadow:0 0 20px var(--purple-glow);}
+
+.search-wrap{position:relative;flex:1;min-width:120px;max-width:240px;z-index:1;}
+#search{
+  width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:2px;padding:6px 28px 6px 10px;color:var(--text);
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+#search:focus{border-color:var(--gold);box-shadow:0 0 8px rgba(255,184,0,.1);}
+#search::placeholder{color:var(--muted);letter-spacing:2px;}
+.s-icon{position:absolute;right:8px;top:50%;transform:translateY(-50%);opacity:.3;pointer-events:none;font-size:10px;color:var(--gold);}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--red) 0%,#990000 100%);
+  color:white;border:none;border-radius:2px;padding:6px 12px;
+  font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+  box-shadow:0 0 10px rgba(204,17,0,.3);z-index:1;
+}
+.btn-primary:hover{background:linear-gradient(135deg,var(--red2) 0%,var(--red) 100%);box-shadow:0 0 16px rgba(255,51,0,.5);}
+.btn-secondary{
+  background:transparent;color:var(--muted);border:1px solid var(--border2);
+  border-radius:2px;padding:6px 10px;
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;white-space:nowrap;transition:all .2s;z-index:1;
+}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold);}
+.help-btn{
+  background:transparent;border:1px solid var(--border2);color:var(--muted);
+  width:28px;height:28px;border-radius:50%;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;cursor:pointer;flex-shrink:0;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;z-index:1;
+}
+.help-btn:hover{border-color:var(--gold);color:var(--gold);}
+.shutdown-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center;z-index:1;}
+.shutdown-btn:hover{border-color:var(--red2);color:var(--red2);box-shadow:0 0 10px rgba(255,51,0,0.3);}
+
+/* ── BODY BELOW HEADER ──────────────────────────────────────────────────── */
+#body{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
+
+/* ── SIDEBAR ────────────────────────────────────────────────────────────── */
+#sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:linear-gradient(180deg,rgba(8,4,20,.97) 0%,rgba(6,4,16,.97) 100%);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  overflow:hidden;position:relative;
+}
+#sidebar::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,var(--red),var(--purple));
+  opacity:.3;
+}
+.sidebar-header{
+  padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.sidebar-title{
+  font-family:'Share Tech Mono',monospace;font-size:8px;
+  color:var(--muted);letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.btn-add-series{
+  width:100%;background:rgba(255,184,0,.06);border:1px dashed rgba(255,184,0,.2);
+  border-radius:2px;color:var(--muted);padding:5px;
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.btn-add-series:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,184,0,.08);}
+
+.series-list{flex:1;overflow-y:auto;padding:6px 0;}
+.series-item{
+  display:flex;align-items:center;gap:0;
+  cursor:pointer;transition:background .15s;
+  border-left:3px solid transparent;
+  position:relative;
+}
+.series-item:hover{background:rgba(255,255,255,.03);}
+.series-item.active{
+  background:rgba(255,184,0,.05);
+  border-left-color:var(--gold);
+}
+.series-item-btn{
+  flex:1;padding:8px 10px 8px 10px;background:none;border:none;
+  text-align:left;cursor:pointer;
+}
+.series-name{
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  color:var(--text);letter-spacing:.5px;display:block;line-height:1.2;
+}
+.series-item.active .series-name{color:var(--gold);}
+.series-meta{
+  font-family:'Share Tech Mono',monospace;font-size:9px;
+  color:var(--muted);display:block;margin-top:1px;
+}
+.series-count{
+  font-family:'Share Tech Mono',monospace;font-size:9px;
+  background:rgba(255,255,255,.05);border-radius:2px;
+  padding:1px 5px;color:var(--muted);margin-right:8px;flex-shrink:0;
+}
+.series-item.active .series-count{background:rgba(255,184,0,.1);color:var(--gold2);}
+.series-del{
+  background:none;border:none;color:transparent;
+  font-size:10px;padding:4px 6px;cursor:pointer;
+  transition:color .15s;flex-shrink:0;
+}
+.series-item:hover .series-del{color:var(--muted);}
+.series-del:hover{color:var(--red2)!important;}
+
+.sidebar-divider{height:1px;background:var(--border);margin:4px 10px;}
+
+/* "Alla" item special */
+.series-item.all-item.active{border-left-color:var(--purple2);}
+.series-item.all-item.active .series-name{color:var(--purple2);}
+
+/* ── MAIN CONTENT ────────────────────────────────────────────────────────── */
+#content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── FILTER BAR ─────────────────────────────────────────────────────────── */
+#filterBar{
+  background:rgba(8,8,20,.95);border-bottom:1px solid var(--border);
+  padding:5px 14px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex-shrink:0;
+}
+.filter-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-right:2px;}
+.filter-group{display:flex;gap:3px;align-items:center;}
+.divider{width:1px;height:14px;background:var(--border2);margin:0 6px;}
+.fbtn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  border-radius:2px;padding:3px 9px;
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.fbtn:hover{border-color:var(--border2);color:var(--text);}
+.fbtn.active{color:white;border-color:transparent;}
+.fbtn.f-all.active{background:#2A2A40;border-color:var(--border2);}
+.fbtn.f-autobot.active{background:var(--autobot);box-shadow:0 0 8px rgba(0,68,187,.5);}
+.fbtn.f-decepticon.active{background:var(--decepticon);box-shadow:0 0 8px rgba(102,0,204,.5);}
+.fbtn.f-ok.active{background:rgba(0,180,80,.7);}
+.fbtn.f-part.active{background:rgba(200,140,0,.8);color:#000;}
+.fbtn.f-no.active{background:rgba(180,0,0,.8);}
+
+/* ── SCROLL AREA ─────────────────────────────────────────────────────────── */
+#scrollArea{flex:1;overflow-y:auto;padding:12px 14px 80px;}
+
+/* ── STATS ──────────────────────────────────────────────────────────────── */
+#statsBar{
+  background:rgba(10,10,22,.8);border:1px solid var(--border2);
+  border-left:2px solid var(--gold);border-radius:2px;
+  padding:6px 12px;margin-bottom:10px;
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:var(--muted);display:none;gap:4px;flex-wrap:wrap;letter-spacing:1px;
+}
+#statsBar b{color:var(--gold);font-weight:normal;}
+
+/* ── ROBOT CARD ─────────────────────────────────────────────────────────── */
+.robot-card{
+  background:linear-gradient(180deg,var(--card) 0%,rgba(13,13,24,.95) 100%);
+  border:1px solid var(--border);border-radius:3px;
+  margin-bottom:6px;overflow:hidden;transition:border-color .2s;position:relative;
+}
+.robot-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,184,0,.0) 30%,rgba(255,184,0,.12) 50%,rgba(255,184,0,.0) 70%,transparent);
+  transition:background .3s;
+}
+.robot-card:hover::before{background:linear-gradient(90deg,transparent,rgba(255,184,0,.3),transparent);}
+.robot-card.open{border-color:rgba(255,184,0,.18);}
+.robot-header{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  cursor:pointer;user-select:none;transition:background .15s;
+}
+.robot-header:hover{background:rgba(255,255,255,.02);}
+.robot-thumb{
+  width:48px;height:48px;flex-shrink:0;border-radius:2px;
+  background:var(--surface);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;border:1px solid var(--border2);
+}
+.robot-thumb img{width:100%;height:100%;object-fit:contain;padding:2px;}
+.robot-thumb-placeholder{font-size:20px;opacity:.1;}
+.thumb-upload{
+  position:absolute;inset:0;background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s;cursor:pointer;
+  font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--gold);letter-spacing:2px;
+}
+.robot-thumb:hover .thumb-upload{opacity:1;}
+.robot-info{flex:1;min-width:0;}
+.robot-name{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;line-height:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.robot-sub{display:flex;gap:5px;align-items:center;margin-top:3px;flex-wrap:wrap;}
+.robot-cat{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.combiner-tag{
+  font-size:9px;color:var(--purple2);background:rgba(102,0,204,.1);
+  border:1px solid rgba(102,0,204,.2);border-radius:2px;padding:1px 5px;
+  font-family:'Share Tech Mono',monospace;letter-spacing:.5px;
+}
+.faction-toggle{display:flex;gap:3px;flex-shrink:0;}
+.ftog{
+  background:transparent;border:1px solid var(--border2);border-radius:2px;
+  padding:2px 7px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;
+  cursor:pointer;color:var(--muted);transition:all .15s;
+}
+.ftog:hover{border-color:#444;color:var(--text);}
+.ftog.autobot.active{background:var(--autobot);border-color:var(--blue2);color:white;box-shadow:0 0 8px rgba(0,68,187,.6);}
+.ftog.decepticon.active{background:var(--decepticon);border-color:var(--purple2);color:white;box-shadow:0 0 8px rgba(102,0,204,.6);}
+.badge{
+  font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 7px;
+  border-radius:2px;white-space:nowrap;flex-shrink:0;letter-spacing:1px;
+}
+.badge-ok  {background:rgba(0,180,60,.1); color:var(--green2);border:1px solid rgba(0,180,60,.25);}
+.badge-part{background:rgba(200,140,0,.1);color:var(--gold2); border:1px solid rgba(200,140,0,.25);}
+.badge-no  {background:rgba(180,0,0,.1);  color:#FF5555;       border:1px solid rgba(180,0,0,.25);}
+.edit-robot,.del-robot{background:none;border:none;cursor:pointer;font-size:12px;padding:4px 5px;border-radius:2px;transition:all .15s;flex-shrink:0;}
+.edit-robot{color:var(--muted);}
+.edit-robot:hover{color:var(--gold);}
+.del-robot{color:var(--muted);}
+.del-robot:hover{color:var(--red2);}
+.chevron{font-size:8px;color:var(--muted);transition:transform .25s,color .25s;flex-shrink:0;font-family:'Share Tech Mono',monospace;}
+.robot-card.open .chevron{transform:rotate(180deg);color:var(--gold);}
+
+/* ── ACCESSORIES ────────────────────────────────────────────────────────── */
+.accessories{display:none;padding:10px 12px;border-top:1px solid var(--border);background:rgba(4,4,12,.6);}
+.robot-card.open .accessories{display:block;}
+.acc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:7px;margin-bottom:10px;}
+.acc-item{
+  background:rgba(13,13,26,.8);border:1px solid var(--border);border-radius:2px;
+  padding:7px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  position:relative;transition:border-color .15s,box-shadow .15s;
+}
+.acc-item:hover{border-color:var(--border2);}
+.acc-item.have{border-color:rgba(0,180,60,.3);background:rgba(0,180,60,.03);box-shadow:0 0 10px rgba(0,180,60,.07);}
+.acc-item.cpart{border-style:dashed;border-color:rgba(102,0,204,.35);background:rgba(102,0,204,.03);}
+.acc-item.cpart.have{border-style:solid;border-color:rgba(0,180,60,.3);background:rgba(0,180,60,.03);box-shadow:0 0 10px rgba(0,180,60,.07);}
+.acc-img-wrap{width:100%;aspect-ratio:1;background:var(--dark);border-radius:2px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;}
+.acc-img-wrap img{width:100%;height:100%;object-fit:contain;padding:3px;}
+.acc-img-placeholder{font-size:20px;opacity:.1;}
+.img-overlay{position:absolute;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;gap:4px;opacity:0;transition:opacity .15s;border-radius:2px;}
+.acc-img-wrap:hover .img-overlay{opacity:1;}
+.img-btn{background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);color:var(--gold);border-radius:2px;padding:3px 7px;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:1px;}
+.img-btn:hover{background:rgba(255,184,0,.25);}
+.acc-name{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;text-align:center;line-height:1.3;color:var(--text);}
+.acc-size{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);}
+.cpart-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--purple2);background:rgba(102,0,204,.1);border-radius:2px;padding:1px 4px;letter-spacing:1px;}
+.qty-row{display:flex;align-items:center;gap:4px;}
+.qty-btn{background:var(--border);border:none;color:var(--text);width:18px;height:18px;border-radius:2px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s;line-height:1;font-family:'Rajdhani',sans-serif;font-weight:700;}
+.qty-btn:hover{background:var(--red);box-shadow:0 0 5px var(--red-glow);}
+.qty-num{font-family:'Share Tech Mono',monospace;font-size:13px;min-width:18px;text-align:center;color:var(--gold);transition:color .2s;}
+.acc-item.have .qty-num{color:var(--green2);text-shadow:0 0 6px rgba(0,255,100,.3);}
+.del-acc{position:absolute;top:4px;right:4px;z-index:10;background:rgba(0,0,0,.7);border:none;color:transparent;font-size:10px;width:16px;height:16px;border-radius:50%;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.acc-item:hover .del-acc{color:#666;}
+.del-acc:hover{color:white!important;background:var(--red)!important;}
+
+.add-acc-row{display:flex;gap:6px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--border);}
+.add-acc-row input,.add-acc-row select{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:2px;color:var(--text);padding:6px 9px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;outline:none;flex:1;min-width:100px;}
+.add-acc-row input:focus,.add-acc-row select:focus{border-color:var(--gold);}
+.add-acc-row select option{background:#111;}
+.btn-add{background:linear-gradient(135deg,var(--red) 0%,#880000 100%);border:none;color:white;border-radius:2px;padding:6px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;cursor:pointer;white-space:nowrap;transition:all .2s;box-shadow:0 0 8px rgba(180,0,0,.3);}
+.btn-add:hover{background:linear-gradient(135deg,var(--red2) 0%,var(--red) 100%);}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────────────────── */
+#empty{text-align:center;padding:80px 20px;color:var(--muted);display:none;}
+#empty .big{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:10px;background:linear-gradient(135deg,var(--red) 0%,var(--purple2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;display:block;}
+#empty p{font-size:13px;font-weight:500;letter-spacing:1px;}
+
+/* ── MODALS ─────────────────────────────────────────────────────────────── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{
+  background:linear-gradient(180deg,var(--card2) 0%,var(--card) 100%);
+  border:1px solid var(--border2);border-top:2px solid var(--red);
+  border-radius:3px;padding:22px;width:100%;max-width:420px;
+  box-shadow:0 24px 60px rgba(0,0,0,.9),0 0 40px rgba(180,0,0,.12);
+}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:var(--gold);margin-bottom:14px;text-shadow:0 0 15px rgba(255,184,0,.3);}
+.modal label{display:block;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:9px 0 3px;}
+.modal input,.modal select{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:2px;color:var(--text);padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;outline:none;}
+.modal input:focus,.modal select:focus{border-color:var(--gold);}
+.modal select option{background:#111;}
+.modal-btns{display:flex;gap:9px;margin-top:16px;}
+.btn-cancel{background:rgba(255,255,255,.03);border:1px solid var(--border2);color:var(--muted);border-radius:2px;padding:7px 14px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s;}
+.btn-cancel:hover{color:var(--text);}
+.faction-row{display:flex;gap:6px;margin-top:4px;}
+.faction-opt{flex:1;background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:2px;padding:7px;text-align:center;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;transition:all .15s;color:var(--muted);}
+.faction-opt:hover{border-color:#444;color:var(--text);}
+.faction-opt.active-a{background:var(--autobot);border-color:var(--blue2);color:white;box-shadow:0 0 10px rgba(0,68,187,.5);}
+.faction-opt.active-d{background:var(--decepticon);border-color:var(--purple2);color:white;box-shadow:0 0 10px rgba(102,0,204,.5);}
+.faction-opt.active-n{background:rgba(255,255,255,.07);border-color:#444;color:var(--text);}
+
+/* Help modal */
+.help-modal{background:linear-gradient(180deg,var(--card2) 0%,var(--card) 100%);border:1px solid var(--border2);border-top:2px solid var(--gold);border-radius:3px;padding:22px;width:100%;max-width:560px;max-height:82vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.9);}
+.help-modal h2{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:var(--gold);margin-bottom:16px;text-shadow:0 0 15px rgba(255,184,0,.3);}
+.help-section{margin-bottom:16px;}
+.help-section h3{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red2);letter-spacing:3px;text-transform:uppercase;margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.help-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:5px;font-size:13px;}
+.help-icon{flex-shrink:0;width:22px;text-align:center;font-size:12px;margin-top:1px;opacity:.8;}
+.help-text{color:var(--muted);line-height:1.5;font-weight:500;}
+.help-text b{color:var(--text);}
+
+input[type=file]{display:none;}
+
+/* ── SERIES MODAL ────────────────────────────────────────────────────────── */
+#seriesModal .modal{border-top-color:var(--gold);}
+
+@media(max-width:700px){
+  #sidebar{width:160px;}
+  :root{--sidebar-w:160px;}
+  .acc-grid{grid-template-columns:repeat(auto-fill,minmax(95px,1fr));}
+}
+@media(max-width:500px){
+  #sidebar{display:none;}
+  header{flex-wrap:wrap;height:auto;padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="header-logo" onclick="uploadLogo()" title="Klicka för att byta logobild">
+    <img id="logoImg" src="" alt="" style="display:none">
+    <span class="header-logo-placeholder" id="logoPlaceholder">⚙</span>
+    <div class="logo-overlay">ÄNDRA</div>
+  </div>
+  <div class="header-title">
+    <span class="tf">TF</span><span class="tracker" style="margin-left:5px">TRACKER</span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="SÖK ROBOT..." autocomplete="off">
+    <span class="s-icon">▶</span>
+  </div>
+  <button class="btn-primary" onclick="openModal()">+ LÄGG TILL</button>
+  <button class="btn-secondary" id="pdfBtn" onclick="exportPdf()">⬇ PDF</button>
+  <button class="help-btn" onclick="document.getElementById('helpModal').classList.add('open')">?</button>
+  <button class="shutdown-btn" onclick="shutdownApp()" title="Stäng av appen">⏻</button>
+</header>
+
+<div id="body">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">// KOLLEKTION</div>
+      <button class="btn-add-series" onclick="openSeriesModal()">+ NY SERIE</button>
+    </div>
+    <div class="series-list" id="seriesList"></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="content">
+    <div id="filterBar">
+      <span class="filter-label">FRAKTION</span>
+      <div class="filter-group">
+        <button class="fbtn f-all active" onclick="setFilter('faction','all',this)">ALLA</button>
+        <button class="fbtn f-autobot" onclick="setFilter('faction','autobot',this)">AUTOBOTS</button>
+        <button class="fbtn f-decepticon" onclick="setFilter('faction','decepticon',this)">DECEPTICONS</button>
+      </div>
+      <div class="divider"></div>
+      <span class="filter-label">STATUS</span>
+      <div class="filter-group">
+        <button class="fbtn f-all active" onclick="setFilter('status','all',this)">ALLA</button>
+        <button class="fbtn f-ok"   onclick="setFilter('status','komplett',this)">KOMPLETT</button>
+        <button class="fbtn f-part" onclick="setFilter('status','har',this)">DELVIS</button>
+        <button class="fbtn f-no"   onclick="setFilter('status','saknar',this)">SAKNAS</button>
+      </div>
+      <div class="divider"></div>
+      <span class="filter-label">TYP</span>
+      <div class="filter-group">
+        <button class="fbtn f-all active" onclick="setFilter('combiner','all',this)">ALLA</button>
+        <button class="fbtn f-all" onclick="setFilter('combiner','ja',this)">COMBINER</button>
+        <button class="fbtn f-all" onclick="setFilter('combiner','nej',this)">VANLIG</button>
+      </div>
+      <div class="divider"></div>
+      <span class="filter-label">SORT</span>
+      <div class="filter-group">
+        <button class="fbtn f-all active" onclick="setSort(false,this)">STANDARD</button>
+        <button class="fbtn f-all" onclick="setSort(true,this)">A–Ö</button>
+      </div>
+    </div>
+
+    <div id="scrollArea">
+      <div id="statsBar" style="display:flex"></div>
+      <div id="empty">
+        <span class="big">AUTOBOTS</span>
+        <p>INGA ROBOTAR I DENNA SERIE.<br>KLICKA + LÄGG TILL FÖR ATT BÖRJA.</p>
+      </div>
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Add robot modal -->
+<div class="overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2>⊕ LÄGG TILL ROBOT</h2>
+    <label>NAMN *</label>
+    <input id="mName" placeholder="t.ex. Onslaught">
+    <label>FRAKTION</label>
+    <div class="faction-row">
+      <div class="faction-opt" id="fo-a" onclick="selectFaction('autobot')">AUTOBOT</div>
+      <div class="faction-opt" id="fo-d" onclick="selectFaction('decepticon')">DECEPTICON</div>
+      <div class="faction-opt" id="fo-n" onclick="selectFaction('')" style="flex:.4">–</div>
+    </div>
+    <label>SERIE</label>
+    <select id="mSeries"></select>
+    <label>KATEGORI</label>
+    <select id="mCat">
+      <option value="">— välj —</option>
+      <option>Combiners - Aerialbots (Superion)</option><option>Combiners - Combaticons (Bruticus)</option>
+      <option>Combiners - Constructicons (Devastator)</option><option>Combiners - Predacons (Predaking)</option>
+      <option>Combiners - Protectobots (Defensor)</option><option>Combiners - Seacons (Piranacon)</option>
+      <option>Combiners - Stunticons (Menasor)</option><option>Combiners - Technobots (Computron)</option>
+      <option>Combiners - Terrorcons (Abominus)</option><option>Action Masters</option>
+      <option>Autobot Cars</option><option>Bases</option><option>Decepticon Jets</option>
+      <option>Dinobots</option><option>Headmasters</option><option>Insecticons</option>
+      <option>Leaders</option><option>Micromasters</option><option>Mini Vehicles</option>
+      <option>Mini-Cassettes</option><option>Monsterbots</option><option>Powermasters</option>
+      <option>Pretenders</option><option>Six Changers</option><option>Targetmasters</option>
+      <option>Throttlebots</option><option>Triple Changers</option>
+    </select>
+    <label>COMBINER</label><input id="mCombiner" placeholder="t.ex. Bruticus">
+    <label>EXEMPLAR #</label><input id="mInstance" placeholder="t.ex. 1, 2 ...">
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">AVBRYT</button>
+      <button class="btn-primary" onclick="addRobot()">LÄGG TILL</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit robot modal -->
+<div class="overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <h2>✏ REDIGERA ROBOT</h2>
+    <label>NAMN *</label><input id="eName" placeholder="t.ex. Onslaught">
+    <label>FRAKTION</label>
+    <div class="faction-row">
+      <div class="faction-opt" id="efo-a" onclick="selectEditFaction('autobot')">AUTOBOT</div>
+      <div class="faction-opt" id="efo-d" onclick="selectEditFaction('decepticon')">DECEPTICON</div>
+      <div class="faction-opt" id="efo-n" onclick="selectEditFaction('')" style="flex:.4">–</div>
+    </div>
+    <label>SERIE</label>
+    <select id="eSeries"></select>
+    <label>KATEGORI</label>
+    <select id="eCat">
+      <option value="">— välj —</option>
+      <option>Combiners - Aerialbots (Superion)</option><option>Combiners - Combaticons (Bruticus)</option>
+      <option>Combiners - Constructicons (Devastator)</option><option>Combiners - Predacons (Predaking)</option>
+      <option>Combiners - Protectobots (Defensor)</option><option>Combiners - Seacons (Piranacon)</option>
+      <option>Combiners - Stunticons (Menasor)</option><option>Combiners - Technobots (Computron)</option>
+      <option>Combiners - Terrorcons (Abominus)</option><option>Action Masters</option>
+      <option>Autobot Cars</option><option>Bases</option><option>Decepticon Jets</option>
+      <option>Dinobots</option><option>Headmasters</option><option>Insecticons</option>
+      <option>Leaders</option><option>Micromasters</option><option>Mini Vehicles</option>
+      <option>Mini-Cassettes</option><option>Monsterbots</option><option>Powermasters</option>
+      <option>Pretenders</option><option>Six Changers</option><option>Targetmasters</option>
+      <option>Throttlebots</option><option>Triple Changers</option>
+    </select>
+    <label>COMBINER</label><input id="eCombiner" placeholder="t.ex. Bruticus">
+    <label>EXEMPLAR #</label><input id="eInstance" placeholder="t.ex. 1, 2 ...">
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditModal()">AVBRYT</button>
+      <button class="btn-primary" onclick="saveRobot()">SPARA</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/edit series modal -->
+<div class="overlay" id="seriesModal" onclick="if(event.target===this)closeSeriesModal()">
+  <div class="modal" style="border-top-color:var(--gold)">
+    <h2 id="seriesModalTitle">⊕ NY SERIE</h2>
+    <label>NAMN *</label><input id="sName" placeholder="t.ex. Generation 1">
+    <label>KORT NAMN</label><input id="sShort" placeholder="t.ex. G1">
+    <label>ÅR</label><input id="sYears" placeholder="t.ex. 1984-1990">
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeSeriesModal()">AVBRYT</button>
+      <button class="btn-primary" onclick="saveSeries()">SPARA</button>
+    </div>
+  </div>
+</div>
+
+<!-- Help modal -->
+<div class="overlay" id="helpModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="help-modal">
+    <h2>// MANUAL</h2>
+    <div class="help-section">
+      <h3>KOLLEKTION / SERIE</h3>
+      <div class="help-row"><span class="help-icon">◈</span><span class="help-text"><b>Sidopanel</b> – välj serie till vänster för att filtrera robotar. "ALLA" visar allt.</span></div>
+      <div class="help-row"><span class="help-icon">+</span><span class="help-text"><b>NY SERIE</b> – lägg till ny kollektion (G2, Beast Wars etc.).</span></div>
+      <div class="help-row"><span class="help-icon">✕</span><span class="help-text"><b>Ta bort serie</b> – hovra på serien, klicka krysset. Robotarna flyttas till "okategoriserade".</span></div>
+    </div>
+    <div class="help-section">
+      <h3>FILTRERA OCH SÖKA</h3>
+      <div class="help-row"><span class="help-icon">▶</span><span class="help-text"><b>Sökfältet</b> filtrerar på robotnamn, kategori eller combiner.</span></div>
+      <div class="help-row"><span class="help-icon">A/D</span><span class="help-text"><b>Fraktion</b> – visa bara Autobots eller Decepticons.</span></div>
+      <div class="help-row"><span class="help-icon">●</span><span class="help-text"><b>Status</b> – Komplett / Delvis / Saknas.</span></div>
+      <div class="help-row"><span class="help-icon">⬡</span><span class="help-text"><b>Typ</b> – combiner-robotar eller vanliga.</span></div>
+    </div>
+    <div class="help-section">
+      <h3>ROBOTKORT</h3>
+      <div class="help-row"><span class="help-icon">📷</span><span class="help-text"><b>Robotbild</b> – hovra och klicka för att ladda upp.</span></div>
+      <div class="help-row"><span class="help-icon">A D</span><span class="help-text"><b>Fraktion</b> – klicka A/D för att sätta fraktion.</span></div>
+      <div class="help-row"><span class="help-icon">✏️</span><span class="help-text"><b>Redigera</b> – ändra namn, serie, fraktion, kategori etc.</span></div>
+      <div class="help-row"><span class="help-icon">✕</span><span class="help-text"><b>Ta bort robot</b> – raderar permanent.</span></div>
+    </div>
+    <div class="help-section">
+      <h3>TILLBEHÖR</h3>
+      <div class="help-row"><span class="help-icon">− +</span><span class="help-text"><b>Bocka av</b> – minus minskar, plus ökar. Grönt = du har det.</span></div>
+      <div class="help-row"><span class="help-icon">⬡</span><span class="help-text"><b>Combiner-del</b> – lila streckad = tillhör kombinationsformen.</span></div>
+      <div class="help-row"><span class="help-icon">✕</span><span class="help-text"><b>Ta bort</b> – hovra, klicka röda krysset uppe till höger.</span></div>
+    </div>
+    <div class="help-section">
+      <h3>ÖVRIGT</h3>
+      <div class="help-row"><span class="help-icon">⬇</span><span class="help-text"><b>PDF</b> – exporterar aktuell serie som PDF.</span></div>
+      <div class="help-row"><span class="help-icon">💾</span><span class="help-text"><b>Backup</b> – kopiera tracker.db och images/-mappen.</span></div>
+    </div>
+    <div style="text-align:right;margin-top:8px">
+      <button class="btn-cancel" onclick="document.getElementById('helpModal').classList.remove('open')">STÄNG</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="imgInput" accept="image/*">
+<input type="file" id="logoInput" accept="image/*">
+<input type="file" id="robotImgInput" accept="image/*">
+
+<script>
+
+let robots = [];
+let pendingImg = null;
+let pendingRobotImg = null;
+let modalFaction = '';
+let editingRobotId = null;
+let editFaction = '';
+let filters = { faction: 'all', status: 'all', combiner: 'all' };
+let sortAlpha = false;
+
+async function api(method, path, body, isFormData) {
+  const opts = { method, headers: isFormData ? {} : {'Content-Type':'application/json'} };
+  if (body) opts.body = isFormData ? body : JSON.stringify(body);
+  const r = await fetch(path, opts);
+  return r.json();
+}
+
+async function init() {
+  robots = await api('GET', '/api/robots');
+  render();
+}
+
+function setFilter(type, value, btn) {
+  filters[type] = value;
+  btn.closest('.filter-group').querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function setSort(alpha, btn) {
+  sortAlpha = alpha;
+  btn.closest('.filter-group').querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function matchesFilters(robot) {
+  const q = document.getElementById('search').value.toLowerCase();
+  if (q && !robot.name.toLowerCase().includes(q) &&
+      !(robot.category||'').toLowerCase().includes(q) &&
+      !(robot.combiner||'').toLowerCase().includes(q)) return false;
+  if (filters.faction !== 'all') {
+    const f = (robot.faction||'').toLowerCase();
+    if (filters.faction === 'autobot' && f !== 'autobot') return false;
+    if (filters.faction === 'decepticon' && f !== 'decepticon') return false;
+  }
+  if (filters.combiner !== 'all') {
+    const isCombiner = !!(robot.combiner && robot.combiner.trim());
+    if (filters.combiner === 'ja' && !isCombiner) return false;
+    if (filters.combiner === 'nej' && isCombiner) return false;
+  }
+  if (filters.status !== 'all') {
+    const tc = robot.accessories.length;
+    const hc = robot.accessories.filter(a=>a.have>0).length;
+    if (filters.status === 'komplett' && !(hc===tc && tc>0)) return false;
+    if (filters.status === 'har' && !(hc>0 && hc<tc)) return false;
+    if (filters.status === 'saknar' && (hc!==0 || tc===0)) return false;
+  }
+  return true;
+}
+
+function render() {
+  const list = document.getElementById('list');
+  const empty = document.getElementById('empty');
+  const stats = document.getElementById('statsBar');
+  list.innerHTML = '';
+
+  let filtered = robots.filter(matchesFilters);
+  if (sortAlpha) filtered = [...filtered].sort((a,b) => a.name.localeCompare(b.name, 'sv'));
+
+  if (!robots.length) { empty.style.display='block'; stats.style.display='none'; return; }
+  empty.style.display = 'none';
+
+  const totalAccs = filtered.reduce((s,r)=>s+r.accessories.length,0);
+  const haveAccs = filtered.reduce((s,r)=>s+r.accessories.filter(a=>a.have>0).length,0);
+  stats.style.display = 'flex';
+  stats.innerHTML = `<b>${filtered.length}</b>/${robots.length} ROBOTAR &nbsp;·&nbsp; <b>${totalAccs}</b> DELAR &nbsp;·&nbsp; <b style="color:var(--green2)">${haveAccs}</b> HAR &nbsp;·&nbsp; <b style="color:#FF6666">${totalAccs-haveAccs}</b> SAKNAR`;
+
+  filtered.forEach(robot => {
+    const tc = robot.accessories.length;
+    const hc = robot.accessories.filter(a=>a.have>0).length;
+    let bc='badge-no', bt=`${hc}/${tc}`;
+    if(hc===tc && tc>0){bc='badge-ok';bt='KOMPLETT';}
+    else if(hc>0) bc='badge-part';
+
+    const faction = (robot.faction||'').toLowerCase();
+    const factionColor = faction==='autobot' ? 'var(--autobot)' : faction==='decepticon' ? 'var(--decepticon)' : '';
+    const imgSrc = robot.img_file ? `/images/${robot.img_file}` : null;
+    const inst = robot.instance ? ` <span style="color:var(--muted);font-size:12px;font-family:'Share Tech Mono',monospace">#${robot.instance}</span>` : '';
+
+    const card = document.createElement('div');
+    card.className = 'robot-card' + (robot.open?' open':'');
+    card.dataset.id = robot.id;
+    if(factionColor) card.style.borderLeft = `3px solid ${factionColor}`;
+
+    card.innerHTML = `
+      <div class="robot-header" onclick="toggleCard('${robot.id}')">
+        <div class="robot-thumb" onclick="event.stopPropagation()">
+          ${imgSrc ? `<img src="${imgSrc}" alt="${robot.name}">` : `<span class="robot-thumb-placeholder">⚙</span>`}
+          <div class="thumb-upload" onclick="uploadRobotImg('${robot.id}')">ÄNDRA</div>
+        </div>
+        <div class="robot-info">
+          <div class="robot-name">${robot.name}${inst}</div>
+          <div class="robot-sub">
+            ${robot.category?`<span class="robot-cat">${robot.category}</span>`:''}
+            ${robot.combiner?`<span class="combiner-tag">⬡ ${robot.combiner}</span>`:''}
+          </div>
+        </div>
+        <div class="faction-toggle" onclick="event.stopPropagation()">
+          <button class="ftog autobot ${faction==='autobot'?'active':''}" onclick="toggleFaction('${robot.id}','autobot')">A</button>
+          <button class="ftog decepticon ${faction==='decepticon'?'active':''}" onclick="toggleFaction('${robot.id}','decepticon')">D</button>
+        </div>
+        <span class="badge ${bc}">${bt}</span>
+        <button class="edit-robot" onclick="event.stopPropagation();openEditModal('${robot.id}')" title="Redigera">✏️</button>
+        <button class="del-robot" onclick="event.stopPropagation();deleteRobot('${robot.id}')" title="Ta bort">✕</button>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="accessories">
+        <div class="acc-grid">${robot.accessories.map(a=>accHTML(robot.id,a)).join('')}</div>
+        <div class="add-acc-row">
+          <input placeholder="Tillbehörsnamn" id="an-${robot.id}">
+          <input placeholder="Storlek" id="as-${robot.id}" style="max-width:90px">
+          <select id="at-${robot.id}"><option value="0">Eget</option><option value="1">Combiner-del</option></select>
+          <button class="btn-add" onclick="addAcc('${robot.id}')">+ LÄGG TILL</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function accHTML(rid, a) {
+  const imgSrc = a.img_file ? `/images/${a.img_file}` : null;
+  return `
+    <div class="acc-item ${a.have>0?'have':''} ${a.combiner_part?'cpart':''}" id="ac-${a.id}">
+      <button class="del-acc" onclick="deleteAcc('${rid}','${a.id}')">✕</button>
+      <div class="acc-img-wrap">
+        ${imgSrc?`<img src="${imgSrc}" alt="${a.name}">`:`<span class="acc-img-placeholder">◈</span>`}
+        <div class="img-overlay">
+          <button class="img-btn" onclick="uploadImg('${a.id}')">BILD</button>
+          ${imgSrc?`<button class="img-btn" onclick="removeImg('${rid}','${a.id}')">✕</button>`:''}
+        </div>
+      </div>
+      <div class="acc-name">${a.name}</div>
+      ${a.size?`<div class="acc-size">${a.size}</div>`:''}
+      ${a.combiner_part?`<div class="cpart-label">⬡ COMBINER</div>`:''}
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeHave('${rid}','${a.id}',-1)">−</button>
+        <span class="qty-num" id="have-${a.id}">${a.have}</span>
+        <button class="qty-btn" onclick="changeHave('${rid}','${a.id}',1)">+</button>
+      </div>
+    </div>`;
+}
+
+async function toggleCard(rid) {
+  const r = robots.find(x=>x.id===rid);
+  if(!r) return;
+  r.open = !r.open;
+  await api('PATCH', `/api/robots/${rid}/open`, {open: r.open});
+  render();
+}
+
+async function toggleFaction(rid, faction) {
+  const r = robots.find(x=>x.id===rid);
+  if(!r) return;
+  r.faction = r.faction === faction ? '' : faction;
+  await api('PATCH', `/api/robots/${rid}`, { name: r.name, category: r.category||'', combiner: r.combiner||'', instance: r.instance||'', faction: r.faction });
+  render();
+}
+
+async function deleteRobot(rid) {
+  if(!confirm('Ta bort robot och alla tillbehör?')) return;
+  await api('DELETE', `/api/robots/${rid}`);
+  robots = robots.filter(r=>r.id!==rid);
+  render();
+}
+
+async function addRobot() {
+  const name = document.getElementById('mName').value.trim();
+  if(!name) { document.getElementById('mName').focus(); return; }
+  await api('POST', '/api/robots', { name, category: document.getElementById('mCat').value, combiner: document.getElementById('mCombiner').value.trim(), instance: document.getElementById('mInstance').value.trim(), faction: modalFaction });
+  closeModal();
+  robots = await api('GET', '/api/robots');
+  render();
+}
+
+async function addAcc(rid) {
+  const name = document.getElementById(`an-${rid}`).value.trim();
+  if(!name) { document.getElementById(`an-${rid}`).focus(); return; }
+  await api('POST', `/api/robots/${rid}/accessories`, { name, size: document.getElementById(`as-${rid}`).value.trim(), combiner_part: document.getElementById(`at-${rid}`).value === '1' });
+  document.getElementById(`an-${rid}`).value='';
+  document.getElementById(`as-${rid}`).value='';
+  robots = await api('GET', '/api/robots');
+  render();
+}
+
+async function deleteAcc(rid, aid) {
+  await api('DELETE', `/api/accessories/${aid}`);
+  const r = robots.find(x=>x.id===rid);
+  if(r) r.accessories = r.accessories.filter(a=>a.id!==aid);
+  render();
+}
+
+async function changeHave(rid, aid, delta) {
+  const r = robots.find(x=>x.id===rid);
+  if(!r) return;
+  const a = r.accessories.find(x=>x.id===aid);
+  if(!a) return;
+  const newHave = Math.max(0, a.have + delta);
+  a.have = newHave;
+  await api('PATCH', `/api/accessories/${aid}/have`, {have: newHave});
+  const haveEl = document.getElementById('have-' + aid);
+  if(haveEl) haveEl.textContent = a.have;
+  const item = document.getElementById('ac-' + aid);
+  if(item) item.classList.toggle('have', a.have > 0);
+  updateBadge(rid);
+}
+
+function updateBadge(rid) {
+  const r = robots.find(x=>x.id===rid);
+  if(!r) return;
+  const tc = r.accessories.length;
+  const hc = r.accessories.filter(a=>a.have>0).length;
+  const card = document.querySelector(`[data-id="${rid}"]`);
+  if(!card) return;
+  const badge = card.querySelector('.badge');
+  if(!badge) return;
+  if(hc===tc && tc>0){ badge.className='badge badge-ok'; badge.textContent='KOMPLETT'; }
+  else if(hc>0){ badge.className='badge badge-part'; badge.textContent=`${hc}/${tc}`; }
+  else { badge.className='badge badge-no'; badge.textContent=`${hc}/${tc}`; }
+}
+
+function uploadRobotImg(rid) {
+  pendingRobotImg = rid;
+  document.getElementById('robotImgInput').click();
+}
+document.getElementById('robotImgInput').addEventListener('change', async function() {
+  if(!this.files[0] || !pendingRobotImg) return;
+  const fd = new FormData();
+  fd.append('image', this.files[0]);
+  await api('POST', `/api/robots/${pendingRobotImg}/image`, fd, true);
+  pendingRobotImg = null; this.value = '';
+  robots = await api('GET', '/api/robots');
+  render();
+});
+
+function uploadImg(aid) {
+  pendingImg = aid;
+  document.getElementById('imgInput').click();
+}
+async function removeImg(rid, aid) {
+  await api('DELETE', `/api/accessories/${aid}/image`);
+  robots = await api('GET', '/api/robots');
+  render();
+}
+document.getElementById('imgInput').addEventListener('change', async function() {
+  if(!this.files[0] || !pendingImg) return;
+  const fd = new FormData();
+  fd.append('image', this.files[0]);
+  await api('POST', `/api/accessories/${pendingImg}/image`, fd, true);
+  pendingImg = null; this.value = '';
+  robots = await api('GET', '/api/robots');
+  render();
+});
+
+function selectFaction(f) {
+  modalFaction = f;
+  document.getElementById('fo-a').className = 'faction-opt' + (f==='autobot'?' active-a':'');
+  document.getElementById('fo-d').className = 'faction-opt' + (f==='decepticon'?' active-d':'');
+  document.getElementById('fo-n').className = 'faction-opt' + (f===''?' active-n':'');
+}
+function openModal() {
+  modalFaction = '';
+  ['mName','mCombiner','mInstance'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mCat').value='';
+  selectFaction('');
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('mName').focus(),50);
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('keydown', e=>{ if(e.key==='Enter') addRobot(); });
+
+function selectEditFaction(f) {
+  editFaction = f;
+  document.getElementById('efo-a').className = 'faction-opt' + (f==='autobot'?' active-a':'');
+  document.getElementById('efo-d').className = 'faction-opt' + (f==='decepticon'?' active-d':'');
+  document.getElementById('efo-n').className = 'faction-opt' + (f===''?' active-n':'');
+}
+function openEditModal(rid) {
+  const r = robots.find(x=>x.id===rid);
+  if(!r) return;
+  editingRobotId = rid;
+  document.getElementById('eName').value = r.name || '';
+  document.getElementById('eCat').value = r.category || '';
+  document.getElementById('eCombiner').value = r.combiner || '';
+  document.getElementById('eInstance').value = r.instance || '';
+  selectEditFaction(r.faction || '');
+  document.getElementById('editModal').classList.add('open');
+  setTimeout(()=>document.getElementById('eName').focus(),50);
+}
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingRobotId = null;
+}
+async function saveRobot() {
+  const name = document.getElementById('eName').value.trim();
+  if(!name) { document.getElementById('eName').focus(); return; }
+  await api('PATCH', `/api/robots/${editingRobotId}`, { name, category: document.getElementById('eCat').value, combiner: document.getElementById('eCombiner').value.trim(), instance: document.getElementById('eInstance').value.trim(), faction: editFaction });
+  closeEditModal();
+  robots = await api('GET', '/api/robots');
+  render();
+}
+document.getElementById('editModal').addEventListener('keydown', e=>{ if(e.key==='Enter') saveRobot(); if(e.key==='Escape') closeEditModal(); });
+
+document.getElementById('search').addEventListener('input', render);
+
+const LOGO_KEY = 'tf_tracker_logo';
+function loadLogo() {
+  const saved = localStorage.getItem(LOGO_KEY);
+  if(saved) {
+    document.getElementById('logoImg').src = saved;
+    document.getElementById('logoImg').style.display = 'block';
+    document.getElementById('logoPlaceholder').style.display = 'none';
+  }
+}
+function uploadLogo() { document.getElementById('logoInput').click(); }
+document.getElementById('logoInput').addEventListener('change', function() {
+  const file = this.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    localStorage.setItem(LOGO_KEY, e.target.result);
+    document.getElementById('logoImg').src = e.target.result;
+    document.getElementById('logoImg').style.display = 'block';
+    document.getElementById('logoPlaceholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+loadLogo();
+init();
+
+async function shutdownApp() {
+  if (!confirm('Stäng av TF Tracker?')) return;
+  await fetch('/api/shutdown', { method: 'POST' });
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:Bebas Neue,sans-serif;background:#04040A;color:#CC1100"><div style=\'font-size:48px;letter-spacing:6px\'>TF TRACKER</div><div style=\'color:#666;font-size:16px;letter-spacing:3px;font-family:Share Tech Mono,monospace\'>OFFLINE</div></div>';
+}
+
+// ── SERIES STATE ──────────────────────────────────────────────────────────
+let allSeries = [];
+let activeSeries = 'all';
+let editingSeriesId = null;
+
+// ── OVERRIDE INIT ─────────────────────────────────────────────────────────
+async function init() {
+  [allSeries, robots] = await Promise.all([
+    api('GET', '/api/series'),
+    api('GET', '/api/robots')
+  ]);
+  renderSidebar();
+  render();
+  populateSeriesSelects();
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById('seriesList');
+  list.innerHTML = '';
+
+  // "Alla" item
+  const allItem = document.createElement('div');
+  allItem.className = 'series-item all-item' + (activeSeries === 'all' ? ' active' : '');
+  allItem.innerHTML = `
+    <button class="series-item-btn" onclick="selectSeries('all')">
+      <span class="series-name">ALLA SERIER</span>
+      <span class="series-meta">${robots.length} robotar</span>
+    </button>
+    <span class="series-count">${robots.length}</span>`;
+  list.appendChild(allItem);
+
+  // Divider
+  const div = document.createElement('div');
+  div.className = 'sidebar-divider';
+  list.appendChild(div);
+
+  // Series items
+  allSeries.forEach(s => {
+    const count = robots.filter(r => r.series_id === s.id).length;
+    const item = document.createElement('div');
+    item.className = 'series-item' + (activeSeries === s.id ? ' active' : '');
+    item.innerHTML = `
+      <button class="series-item-btn" onclick="selectSeries('${s.id}')">
+        <span class="series-name">${s.name}</span>
+        <span class="series-meta">${s.years || ''}</span>
+      </button>
+      <span class="series-count">${count}</span>
+      <button class="series-del" onclick="deleteSeries('${s.id}')" title="Ta bort serie">✕</button>`;
+    list.appendChild(item);
+  });
+}
+
+async function selectSeries(sid) {
+  activeSeries = sid;
+  robots = await api('GET', sid === 'all' ? '/api/robots' : `/api/robots?series_id=${sid}`);
+  renderSidebar();
+  render();
+}
+
+async function deleteSeries(sid) {
+  const s = allSeries.find(x => x.id === sid);
+  if (!s) return;
+  if (!confirm(`Ta bort serien "${s.name}"? Robotarna behålls men tappar sin serie.`)) return;
+  await api('DELETE', `/api/series/${sid}`);
+  if (activeSeries === sid) activeSeries = 'all';
+  [allSeries, robots] = await Promise.all([
+    api('GET', '/api/series'),
+    api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`)
+  ]);
+  renderSidebar();
+  render();
+  populateSeriesSelects();
+}
+
+// ── SERIES MODAL ──────────────────────────────────────────────────────────
+function openSeriesModal(sid) {
+  editingSeriesId = sid || null;
+  if (sid) {
+    const s = allSeries.find(x => x.id === sid);
+    document.getElementById('seriesModalTitle').textContent = '✏ REDIGERA SERIE';
+    document.getElementById('sName').value = s.name;
+    document.getElementById('sShort').value = s.short_name;
+    document.getElementById('sYears').value = s.years || '';
+  } else {
+    document.getElementById('seriesModalTitle').textContent = '⊕ NY SERIE';
+    document.getElementById('sName').value = '';
+    document.getElementById('sShort').value = '';
+    document.getElementById('sYears').value = '';
+  }
+  document.getElementById('seriesModal').classList.add('open');
+  setTimeout(() => document.getElementById('sName').focus(), 50);
+}
+
+function closeSeriesModal() {
+  document.getElementById('seriesModal').classList.remove('open');
+  editingSeriesId = null;
+}
+
+async function saveSeries() {
+  const name = document.getElementById('sName').value.trim();
+  if (!name) { document.getElementById('sName').focus(); return; }
+  const data = {
+    name,
+    short_name: document.getElementById('sShort').value.trim() || name.slice(0,4).toUpperCase(),
+    years: document.getElementById('sYears').value.trim()
+  };
+  if (editingSeriesId) {
+    await api('PATCH', `/api/series/${editingSeriesId}`, data);
+  } else {
+    await api('POST', '/api/series', data);
+  }
+  closeSeriesModal();
+  allSeries = await api('GET', '/api/series');
+  renderSidebar();
+  populateSeriesSelects();
+}
+
+document.getElementById('seriesModal').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveSeries();
+  if (e.key === 'Escape') closeSeriesModal();
+});
+
+// ── POPULATE SERIES SELECTS ───────────────────────────────────────────────
+function populateSeriesSelects() {
+  ['mSeries', 'eSeries'].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— ingen serie —</option>' +
+      allSeries.map(s => `<option value="${s.id}">${s.name} ${s.years ? '(' + s.years + ')' : ''}</option>`).join('');
+    if (cur) sel.value = cur;
+    // Default to active series
+    if (!cur && activeSeries !== 'all') sel.value = activeSeries;
+  });
+}
+
+// ── OVERRIDE addRobot to include series ───────────────────────────────────
+const _origAddRobot = addRobot;
+addRobot = async function() {
+  const name = document.getElementById('mName').value.trim();
+  if (!name) { document.getElementById('mName').focus(); return; }
+  await api('POST', '/api/robots', {
+    name,
+    category: document.getElementById('mCat').value,
+    combiner: document.getElementById('mCombiner').value.trim(),
+    instance: document.getElementById('mInstance').value.trim(),
+    faction: modalFaction,
+    series_id: document.getElementById('mSeries').value || null
+  });
+  closeModal();
+  [allSeries, robots] = await Promise.all([
+    api('GET', '/api/series'),
+    api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`)
+  ]);
+  renderSidebar();
+  render();
+};
+
+// ── OVERRIDE saveRobot to include series ─────────────────────────────────
+const _origSaveRobot = saveRobot;
+saveRobot = async function() {
+  const name = document.getElementById('eName').value.trim();
+  if (!name) { document.getElementById('eName').focus(); return; }
+  await api('PATCH', `/api/robots/${editingRobotId}`, {
+    name,
+    category: document.getElementById('eCat').value,
+    combiner: document.getElementById('eCombiner').value.trim(),
+    instance: document.getElementById('eInstance').value.trim(),
+    faction: editFaction,
+    series_id: document.getElementById('eSeries').value || null
+  });
+  closeEditModal();
+  [allSeries, robots] = await Promise.all([
+    api('GET', '/api/series'),
+    api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`)
+  ]);
+  renderSidebar();
+  render();
+};
+
+// ── OVERRIDE openEditModal to populate series ─────────────────────────────
+const _origOpenEditModal = openEditModal;
+openEditModal = function(rid) {
+  _origOpenEditModal(rid);
+  const r = robots.find(x => x.id === rid);
+  if (r) {
+    document.getElementById('eSeries').value = r.series_id || '';
+  }
+};
+
+// ── OVERRIDE openModal to default series ─────────────────────────────────
+const _origOpenModal = openModal;
+openModal = function() {
+  _origOpenModal();
+  if (activeSeries !== 'all') {
+    document.getElementById('mSeries').value = activeSeries;
+  }
+};
+
+// ── PDF EXPORT with series ────────────────────────────────────────────────
+function exportPdf() {
+  const url = activeSeries === 'all'
+    ? '/api/export/pdf'
+    : `/api/export/pdf?series_id=${activeSeries}`;
+  window.location = url;
+}
+
+// ── OVERRIDE deleteRobot to refresh sidebar ───────────────────────────────
+const _origDeleteRobot = deleteRobot;
+deleteRobot = async function(rid) {
+  if (!confirm('Ta bort robot och alla tillbehör?')) return;
+  await api('DELETE', `/api/robots/${rid}`);
+  [allSeries, robots] = await Promise.all([
+    api('GET', '/api/series'),
+    api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`)
+  ]);
+  renderSidebar();
+  render();
+};
+</script>
+</body>
+</html>
