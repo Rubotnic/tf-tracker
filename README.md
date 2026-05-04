@@ -34,7 +34,7 @@ Built for collectors who want full control of their data without cloud services 
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/tf-tracker.git
+git clone https://github.com/Rubotnic/tf-tracker.git
 cd tf-tracker
 ```
 
