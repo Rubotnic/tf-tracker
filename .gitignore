@@ -1,7 +1,4 @@
 # Database — contains your personal collection data
-tracker.db
-tracker_new.db
-*.db
 
 # Uploaded images — your personal photos
 images/
