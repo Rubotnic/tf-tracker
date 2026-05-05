@@ -4,7 +4,6 @@ A local web app for tracking your Transformers figure collection — accessories
 
 ![TF Tracker screenshot](assets/screenshot.png)
 
-
 Built for collectors who want full control of their data without cloud services or subscriptions.
 
 ![Transformers G1](https://img.shields.io/badge/Generations-G1%20to%20TR-red?style=flat-square)
