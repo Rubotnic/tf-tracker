@@ -50,6 +50,8 @@ def init_db():
             img_file    TEXT,
             faction     TEXT DEFAULT '',
             series_id   TEXT REFERENCES series(id),
+            value       REAL DEFAULT 0,
+            notes       TEXT DEFAULT '',
             created_at  TEXT DEFAULT (datetime('now'))
         );
 
@@ -105,6 +107,8 @@ def init_db():
         "ALTER TABLE robots ADD COLUMN series_id TEXT REFERENCES series(id)",
         "ALTER TABLE robots ADD COLUMN img_file TEXT",
         "ALTER TABLE robots ADD COLUMN faction TEXT DEFAULT ''",
+        "ALTER TABLE robots ADD COLUMN value REAL DEFAULT 0",
+        "ALTER TABLE robots ADD COLUMN notes TEXT DEFAULT ''",
     ]:
         try: db.execute(sql)
         except: pass
@@ -189,7 +193,7 @@ def add_robot():
     rid = str(uuid.uuid4())
     max_order = get_db().execute("SELECT COALESCE(MAX(sort_order),0) FROM robots").fetchone()[0]
     get_db().execute(
-        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id) VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes) VALUES (?,?,?,?,?,?,?,?,0,'')",
         (rid, d['name'], d.get('category',''), d.get('combiner',''),
          d.get('instance',''), max_order+1, d.get('faction',''), d.get('series_id'))
     )
@@ -200,9 +204,10 @@ def add_robot():
 def update_robot(rid):
     d = request.json
     get_db().execute(
-        "UPDATE robots SET name=?, category=?, combiner=?, instance=?, faction=?, series_id=? WHERE id=?",
+        "UPDATE robots SET name=?, category=?, combiner=?, instance=?, faction=?, series_id=?, value=?, notes=? WHERE id=?",
         (d['name'], d.get('category',''), d.get('combiner',''),
-         d.get('instance',''), d.get('faction',''), d.get('series_id'), rid)
+         d.get('instance',''), d.get('faction',''), d.get('series_id'),
+         d.get('value', 0), d.get('notes', ''), rid)
     )
     get_db().commit()
     return jsonify({'ok': True})
