@@ -2182,7 +2182,8 @@
       if (editingSeriesId) {
         await api('PATCH', `/api/series/${editingSeriesId}`, data);
       } else {
-        await api('POST', '/api/series', data);
+        const res = await api('POST', '/api/series', data);
+        if (res && res.error) { alert(res.error); return; }
       }
       closeSeriesModal();
       allSeries = await api('GET', '/api/series');

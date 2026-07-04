@@ -129,9 +129,7 @@ def serve_image(filename):
 @app.route('/api/series', methods=['GET'])
 def get_series():
     rows = get_db().execute("""
-        SELECT s.*,
-               COUNT(r.id) as robot_count,
-               SUM(CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END) as total
+        SELECT s.*, COUNT(r.id) as robot_count
         FROM series s
         LEFT JOIN robots r ON r.series_id = s.id
         GROUP BY s.id
@@ -142,12 +140,18 @@ def get_series():
 @app.route('/api/series', methods=['POST'])
 def add_series():
     d = request.json
+    name = (d.get('name') or '').strip()
+    if not name:
+        return jsonify({'error': 'Namn saknas'}), 400
     sid = str(uuid.uuid4())
     max_order = get_db().execute("SELECT COALESCE(MAX(sort_order),0) FROM series").fetchone()[0]
-    get_db().execute(
-        "INSERT INTO series (id,name,short_name,years,sort_order) VALUES (?,?,?,?,?)",
-        (sid, d['name'], d.get('short_name', d['name'][:4].upper()), d.get('years',''), max_order+1)
-    )
+    try:
+        get_db().execute(
+            "INSERT INTO series (id,name,short_name,years,sort_order) VALUES (?,?,?,?,?)",
+            (sid, name, d.get('short_name') or name[:4].upper(), d.get('years',''), max_order+1)
+        )
+    except sqlite3.IntegrityError:
+        return jsonify({'error': 'En serie med det namnet finns redan'}), 409
     get_db().commit()
     return jsonify({'id': sid})
 
@@ -181,10 +185,11 @@ def get_robots():
         ).fetchall()
     else:
         robots = db.execute("SELECT * FROM robots ORDER BY sort_order, name").fetchall()
-    result = []
-    for r in robots:
-        accs = db.execute("SELECT * FROM accessories WHERE robot_id=? ORDER BY sort_order", (r['id'],)).fetchall()
-        result.append({**dict(r), 'accessories': [dict(a) for a in accs]})
+    # Fetch all accessories in one query instead of one per robot
+    acc_map = {}
+    for a in db.execute("SELECT * FROM accessories ORDER BY sort_order").fetchall():
+        acc_map.setdefault(a['robot_id'], []).append(dict(a))
+    result = [{**dict(r), 'accessories': acc_map.get(r['id'], [])} for r in robots]
     return jsonify(result)
 
 @app.route('/api/robots', methods=['POST'])
@@ -193,9 +198,10 @@ def add_robot():
     rid = str(uuid.uuid4())
     max_order = get_db().execute("SELECT COALESCE(MAX(sort_order),0) FROM robots").fetchone()[0]
     get_db().execute(
-        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes) VALUES (?,?,?,?,?,?,?,?,0,'')",
+        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes) VALUES (?,?,?,?,?,?,?,?,?,?)",
         (rid, d['name'], d.get('category',''), d.get('combiner',''),
-         d.get('instance',''), max_order+1, d.get('faction',''), d.get('series_id'))
+         d.get('instance',''), max_order+1, d.get('faction',''), d.get('series_id'),
+         d.get('value', 0) or 0, d.get('notes', ''))
     )
     get_db().commit()
     return jsonify({'id': rid})
@@ -237,7 +243,8 @@ def upload_robot_image(rid):
     if row and row['img_file']:
         old = os.path.join(IMG_DIR, row['img_file'])
         if os.path.exists(old): os.remove(old)
-    ext = os.path.splitext(file.filename)[1].lower() or '.jpg'
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ('.jpg', '.jpeg', '.png', '.gif', '.webp'): ext = '.jpg'
     filename = f"robot_{rid}{ext}"
     file.save(os.path.join(IMG_DIR, filename))
     get_db().execute("UPDATE robots SET img_file=? WHERE id=?", (filename, rid))
@@ -272,7 +279,10 @@ def add_accessory(rid):
 @app.route('/api/accessories/<aid>/qty', methods=['PATCH'])
 def update_qty(aid):
     d = request.json
-    qty = max(1, int(d.get('qty', 1)))
+    try:
+        qty = max(1, int(d.get('qty', 1)))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Ogiltigt antal'}), 400
     get_db().execute("UPDATE accessories SET qty=?, have=MIN(have,?) WHERE id=?", (qty, qty, aid))
     get_db().commit()
     row = get_db().execute("SELECT qty, have FROM accessories WHERE id=?", (aid,)).fetchone()
@@ -281,7 +291,10 @@ def update_qty(aid):
 @app.route('/api/accessories/<aid>/have', methods=['PATCH'])
 def update_have(aid):
     d = request.json
-    have = max(0, int(d.get('have', 0)))
+    try:
+        have = max(0, int(d.get('have', 0)))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Ogiltigt antal'}), 400
     get_db().execute("UPDATE accessories SET have=? WHERE id=?", (have, aid))
     get_db().commit()
     return jsonify({'have': have})
@@ -300,7 +313,12 @@ def delete_accessory(aid):
 def upload_image(aid):
     file = request.files.get('image')
     if not file: return jsonify({'error': 'no file'}), 400
-    ext = os.path.splitext(file.filename)[1].lower() or '.jpg'
+    row = get_db().execute("SELECT img_file FROM accessories WHERE id=?", (aid,)).fetchone()
+    if row and row['img_file']:
+        old = os.path.join(IMG_DIR, row['img_file'])
+        if os.path.exists(old): os.remove(old)
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ('.jpg', '.jpeg', '.png', '.gif', '.webp'): ext = '.jpg'
     filename = f"{aid}{ext}"
     file.save(os.path.join(IMG_DIR, filename))
     get_db().execute("UPDATE accessories SET img_file=? WHERE id=?", (filename, aid))
