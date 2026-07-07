@@ -435,24 +435,25 @@ input[type=file]{display:none;}
 
 <!-- HEADER -->
 <header>
-  <div class="header-logo" onclick="uploadLogo()" title="Klicka för att byta logobild">
+  <div class="header-logo" onclick="uploadLogo()" data-i18n-title="logo_title" title="Klicka för att byta logobild">
     <img id="logoImg" src="" alt="" style="display:none">
     <span class="header-logo-placeholder" id="logoPlaceholder">⚙</span>
-    <div class="logo-overlay">ÄNDRA</div>
+    <div class="logo-overlay" data-i18n="change">ÄNDRA</div>
   </div>
   <div class="header-title">
     <span class="tf">TF</span><span class="tracker" style="margin-left:5px">TRACKER</span>
   </div>
   <div class="search-wrap">
-    <input type="text" id="search" placeholder="SÖK ROBOT..." autocomplete="off">
+    <input type="text" id="search" data-i18n-ph="search_ph" placeholder="SÖK ROBOT..." autocomplete="off">
     <span class="s-icon">▶</span>
   </div>
-  <button class="btn-primary" onclick="openModal()">+ LÄGG TILL</button>
+  <button class="btn-primary" onclick="openModal()" data-i18n="btn_add">+ LÄGG TILL</button>
   <button class="btn-secondary" id="pdfBtn" onclick="exportPdf()">⬇ PDF</button>
-  <button class="btn-secondary" onclick="exportCsv()" title="Exportera aktuell serie som CSV (Excel)">⬇ CSV</button>
-  <button class="btn-secondary" onclick="window.location='/api/backup'" title="Ladda ner backup av hela samlingen">💾 BACKUP</button>
+  <button class="btn-secondary" onclick="exportCsv()" data-i18n-title="csv_title" title="Exportera aktuell serie som CSV (Excel)">⬇ CSV</button>
+  <button class="btn-secondary" onclick="window.location='/api/backup'" data-i18n-title="backup_title" title="Ladda ner backup av hela samlingen">💾 BACKUP</button>
+  <button class="btn-secondary" id="langBtn" onclick="toggleLang()" title="Byt språk / Switch language" style="min-width:38px">EN</button>
   <button class="help-btn" onclick="document.getElementById('helpModal').classList.add('open')">?</button>
-  <button class="shutdown-btn" onclick="shutdownApp()" title="Stäng av appen">⏻</button>
+  <button class="shutdown-btn" onclick="shutdownApp()" data-i18n-title="shutdown_title" title="Stäng av appen">⏻</button>
 </header>
 
 <div id="body">
@@ -460,8 +461,8 @@ input[type=file]{display:none;}
   <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-title">// KOLLEKTION</div>
-      <button class="btn-add-series" onclick="openSeriesModal()">+ NY SERIE</button>
+      <div class="sidebar-title" data-i18n="sidebar_title">// KOLLEKTION</div>
+      <button class="btn-add-series" onclick="openSeriesModal()" data-i18n="btn_new_series">+ NY SERIE</button>
     </div>
     <div class="series-list" id="seriesList"></div>
   </div>
@@ -469,39 +470,39 @@ input[type=file]{display:none;}
   <!-- MAIN CONTENT -->
   <div id="content">
     <div id="filterBar">
-      <span class="filter-label">FRAKTION</span>
+      <span class="filter-label" data-i18n="f_faction">FRAKTION</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('faction','all',this)">ALLA</button>
+        <button class="fbtn f-all active" onclick="setFilter('faction','all',this)" data-i18n="all">ALLA</button>
         <button class="fbtn f-autobot" onclick="setFilter('faction','autobot',this)">AUTOBOTS</button>
         <button class="fbtn f-decepticon" onclick="setFilter('faction','decepticon',this)">DECEPTICONS</button>
       </div>
       <div class="divider"></div>
-      <span class="filter-label">ÄGD</span>
+      <span class="filter-label" data-i18n="f_owned">ÄGD</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('owned','all',this)">ALLA</button>
-        <button class="fbtn f-ok" onclick="setFilter('owned','ja',this)">ÄGER</button>
-        <button class="fbtn f-no" onclick="setFilter('owned','nej',this)">ÄGER EJ</button>
+        <button class="fbtn f-all active" onclick="setFilter('owned','all',this)" data-i18n="all">ALLA</button>
+        <button class="fbtn f-ok" onclick="setFilter('owned','ja',this)" data-i18n="owns">ÄGER</button>
+        <button class="fbtn f-no" onclick="setFilter('owned','nej',this)" data-i18n="owns_not">ÄGER EJ</button>
       </div>
       <div class="divider"></div>
-      <span class="filter-label">STATUS</span>
+      <span class="filter-label" data-i18n="f_status">STATUS</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('status','all',this)">ALLA</button>
-        <button class="fbtn f-ok"   onclick="setFilter('status','komplett',this)">KOMPLETT</button>
-        <button class="fbtn f-part" onclick="setFilter('status','har',this)">DELVIS</button>
-        <button class="fbtn f-no"   onclick="setFilter('status','saknar',this)">SAKNAS</button>
+        <button class="fbtn f-all active" onclick="setFilter('status','all',this)" data-i18n="all">ALLA</button>
+        <button class="fbtn f-ok"   onclick="setFilter('status','komplett',this)" data-i18n="complete">KOMPLETT</button>
+        <button class="fbtn f-part" onclick="setFilter('status','har',this)" data-i18n="partial">DELVIS</button>
+        <button class="fbtn f-no"   onclick="setFilter('status','saknar',this)" data-i18n="missing">SAKNAS</button>
       </div>
       <div class="divider"></div>
-      <span class="filter-label">TYP</span>
+      <span class="filter-label" data-i18n="f_type">TYP</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('combiner','all',this)">ALLA</button>
+        <button class="fbtn f-all active" onclick="setFilter('combiner','all',this)" data-i18n="all">ALLA</button>
         <button class="fbtn f-all" onclick="setFilter('combiner','ja',this)">COMBINER</button>
-        <button class="fbtn f-all" onclick="setFilter('combiner','nej',this)">VANLIG</button>
+        <button class="fbtn f-all" onclick="setFilter('combiner','nej',this)" data-i18n="regular">VANLIG</button>
       </div>
       <div class="divider"></div>
-      <span class="filter-label">SORT</span>
+      <span class="filter-label" data-i18n="f_sort">SORT</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setSort(false,this)">STANDARD</button>
-        <button class="fbtn f-all" onclick="setSort(true,this)">A–Ö</button>
+        <button class="fbtn f-all active" onclick="setSort(false,this)" data-i18n="standard">STANDARD</button>
+        <button class="fbtn f-all" onclick="setSort(true,this)" data-i18n="az">A–Ö</button>
       </div>
     </div>
 
@@ -509,7 +510,7 @@ input[type=file]{display:none;}
       <div id="statsBar" style="display:flex"></div>
       <div id="empty">
         <span class="big">AUTOBOTS</span>
-        <p>INGA ROBOTAR I DENNA SERIE.<br>KLICKA + LÄGG TILL FÖR ATT BÖRJA.</p>
+        <p data-i18n-html="empty_msg">INGA ROBOTAR I DENNA SERIE.<br>KLICKA + LÄGG TILL FÖR ATT BÖRJA.</p>
       </div>
       <div id="list"></div>
     </div>
@@ -520,20 +521,20 @@ input[type=file]{display:none;}
 <!-- Add robot modal -->
 <div class="overlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <h2>⊕ LÄGG TILL ROBOT</h2>
-    <label>NAMN *</label>
-    <input id="mName" placeholder="t.ex. Onslaught">
-    <label>FRAKTION</label>
+    <h2 data-i18n="h_add">⊕ LÄGG TILL ROBOT</h2>
+    <label data-i18n="lbl_name">NAMN *</label>
+    <input id="mName" data-i18n-ph="name_ph" placeholder="t.ex. Onslaught">
+    <label data-i18n="lbl_faction">FRAKTION</label>
     <div class="faction-row">
       <div class="faction-opt" id="fo-a" onclick="selectFaction('autobot')">AUTOBOT</div>
       <div class="faction-opt" id="fo-d" onclick="selectFaction('decepticon')">DECEPTICON</div>
       <div class="faction-opt" id="fo-n" onclick="selectFaction('')" style="flex:.4">–</div>
     </div>
-    <label>SERIE</label>
+    <label data-i18n="lbl_series">SERIE</label>
     <select id="mSeries"></select>
-    <label>KATEGORI</label>
+    <label data-i18n="lbl_cat">KATEGORI</label>
     <select id="mCat">
-      <option value="">— välj —</option>
+      <option value="" data-i18n="choose">— välj —</option>
       <option>Combiners - Aerialbots (Superion)</option><option>Combiners - Combaticons (Bruticus)</option>
       <option>Combiners - Constructicons (Devastator)</option><option>Combiners - Predacons (Predaking)</option>
       <option>Combiners - Protectobots (Defensor)</option><option>Combiners - Seacons (Piranacon)</option>
@@ -546,18 +547,18 @@ input[type=file]{display:none;}
       <option>Pretenders</option><option>Six Changers</option><option>Targetmasters</option>
       <option>Throttlebots</option><option>Triple Changers</option>
     </select>
-    <label>COMBINER</label><input id="mCombiner" placeholder="t.ex. Bruticus">
-    <label>EXEMPLAR #</label><input id="mInstance" placeholder="t.ex. 1, 2 ...">
+    <label data-i18n="lbl_combiner">COMBINER</label><input id="mCombiner" data-i18n-ph="combiner_ph" placeholder="t.ex. Bruticus">
+    <label data-i18n="lbl_instance">EXEMPLAR #</label><input id="mInstance" data-i18n-ph="instance_ph" placeholder="t.ex. 1, 2 ...">
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:10px">
-      <input type="checkbox" id="mOwned" style="width:16px;height:16px;accent-color:var(--green2)"> JAG ÄGER DENNA FIGUR
+      <input type="checkbox" id="mOwned" style="width:16px;height:16px;accent-color:var(--green2)"> <span data-i18n="i_own_this">JAG ÄGER DENNA FIGUR</span>
     </label>
-    <label>UPPSKATTAT VÄRDE (kr)</label>
-    <input id="mValue" type="number" min="0" placeholder="t.ex. 250">
-    <label>NOTERINGAR</label>
-    <textarea id="mNotes" placeholder="t.ex. Köpt 2024, saknar vänster arm..." rows="3" style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:2px;color:var(--text);padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;outline:none;resize:vertical;"></textarea>
+    <label data-i18n="lbl_value">UPPSKATTAT VÄRDE (kr)</label>
+    <input id="mValue" type="number" min="0" data-i18n-ph="value_ph" placeholder="t.ex. 250">
+    <label data-i18n="lbl_notes">NOTERINGAR</label>
+    <textarea id="mNotes" data-i18n-ph="notes_ph" placeholder="t.ex. Köpt 2024, saknar vänster arm..." rows="3" style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:2px;color:var(--text);padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;outline:none;resize:vertical;"></textarea>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">AVBRYT</button>
-      <button class="btn-primary" onclick="addRobot()">LÄGG TILL</button>
+      <button class="btn-cancel" onclick="closeModal()" data-i18n="cancel">AVBRYT</button>
+      <button class="btn-primary" onclick="addRobot()" data-i18n="add">LÄGG TILL</button>
     </div>
   </div>
 </div>
@@ -565,19 +566,19 @@ input[type=file]{display:none;}
 <!-- Edit robot modal -->
 <div class="overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
   <div class="modal">
-    <h2>✏ REDIGERA ROBOT</h2>
-    <label>NAMN *</label><input id="eName" placeholder="t.ex. Onslaught">
-    <label>FRAKTION</label>
+    <h2 data-i18n="h_edit">✏ REDIGERA ROBOT</h2>
+    <label data-i18n="lbl_name">NAMN *</label><input id="eName" data-i18n-ph="name_ph" placeholder="t.ex. Onslaught">
+    <label data-i18n="lbl_faction">FRAKTION</label>
     <div class="faction-row">
       <div class="faction-opt" id="efo-a" onclick="selectEditFaction('autobot')">AUTOBOT</div>
       <div class="faction-opt" id="efo-d" onclick="selectEditFaction('decepticon')">DECEPTICON</div>
       <div class="faction-opt" id="efo-n" onclick="selectEditFaction('')" style="flex:.4">–</div>
     </div>
-    <label>SERIE</label>
+    <label data-i18n="lbl_series">SERIE</label>
     <select id="eSeries"></select>
-    <label>KATEGORI</label>
+    <label data-i18n="lbl_cat">KATEGORI</label>
     <select id="eCat">
-      <option value="">— välj —</option>
+      <option value="" data-i18n="choose">— välj —</option>
       <option>Combiners - Aerialbots (Superion)</option><option>Combiners - Combaticons (Bruticus)</option>
       <option>Combiners - Constructicons (Devastator)</option><option>Combiners - Predacons (Predaking)</option>
       <option>Combiners - Protectobots (Defensor)</option><option>Combiners - Seacons (Piranacon)</option>
@@ -590,18 +591,18 @@ input[type=file]{display:none;}
       <option>Pretenders</option><option>Six Changers</option><option>Targetmasters</option>
       <option>Throttlebots</option><option>Triple Changers</option>
     </select>
-    <label>COMBINER</label><input id="eCombiner" placeholder="t.ex. Bruticus">
-    <label>EXEMPLAR #</label><input id="eInstance" placeholder="t.ex. 1, 2 ...">
+    <label data-i18n="lbl_combiner">COMBINER</label><input id="eCombiner" data-i18n-ph="combiner_ph" placeholder="t.ex. Bruticus">
+    <label data-i18n="lbl_instance">EXEMPLAR #</label><input id="eInstance" data-i18n-ph="instance_ph" placeholder="t.ex. 1, 2 ...">
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:10px">
-      <input type="checkbox" id="eOwned" style="width:16px;height:16px;accent-color:var(--green2)"> JAG ÄGER DENNA FIGUR
+      <input type="checkbox" id="eOwned" style="width:16px;height:16px;accent-color:var(--green2)"> <span data-i18n="i_own_this">JAG ÄGER DENNA FIGUR</span>
     </label>
-    <label>UPPSKATTAT VÄRDE (kr)</label>
-    <input id="eValue" type="number" min="0" placeholder="t.ex. 250">
-    <label>NOTERINGAR</label>
-    <textarea id="eNotes" placeholder="t.ex. Köpt 2024, saknar vänster arm..." rows="3" style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:2px;color:var(--text);padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;outline:none;resize:vertical;"></textarea>
+    <label data-i18n="lbl_value">UPPSKATTAT VÄRDE (kr)</label>
+    <input id="eValue" type="number" min="0" data-i18n-ph="value_ph" placeholder="t.ex. 250">
+    <label data-i18n="lbl_notes">NOTERINGAR</label>
+    <textarea id="eNotes" data-i18n-ph="notes_ph" placeholder="t.ex. Köpt 2024, saknar vänster arm..." rows="3" style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:2px;color:var(--text);padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;outline:none;resize:vertical;"></textarea>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeEditModal()">AVBRYT</button>
-      <button class="btn-primary" onclick="saveRobot()">SPARA</button>
+      <button class="btn-cancel" onclick="closeEditModal()" data-i18n="cancel">AVBRYT</button>
+      <button class="btn-primary" onclick="saveRobot()" data-i18n="save">SPARA</button>
     </div>
   </div>
 </div>
@@ -610,12 +611,12 @@ input[type=file]{display:none;}
 <div class="overlay" id="seriesModal" onclick="if(event.target===this)closeSeriesModal()">
   <div class="modal" style="border-top-color:var(--gold)">
     <h2 id="seriesModalTitle">⊕ NY SERIE</h2>
-    <label>NAMN *</label><input id="sName" placeholder="t.ex. Generation 1">
-    <label>KORT NAMN</label><input id="sShort" placeholder="t.ex. G1">
-    <label>ÅR</label><input id="sYears" placeholder="t.ex. 1984-1990">
+    <label data-i18n="lbl_name">NAMN *</label><input id="sName" data-i18n-ph="sname_ph" placeholder="t.ex. Generation 1">
+    <label data-i18n="lbl_short">KORT NAMN</label><input id="sShort" data-i18n-ph="sshort_ph" placeholder="t.ex. G1">
+    <label data-i18n="lbl_years">ÅR</label><input id="sYears" data-i18n-ph="syears_ph" placeholder="t.ex. 1984-1990">
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeSeriesModal()">AVBRYT</button>
-      <button class="btn-primary" onclick="saveSeries()">SPARA</button>
+      <button class="btn-cancel" onclick="closeSeriesModal()" data-i18n="cancel">AVBRYT</button>
+      <button class="btn-primary" onclick="saveSeries()" data-i18n="save">SPARA</button>
     </div>
   </div>
 </div>
@@ -623,42 +624,43 @@ input[type=file]{display:none;}
 <!-- Help modal -->
 <div class="overlay" id="helpModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="help-modal">
-    <h2>// MANUAL</h2>
+    <h2 data-i18n="help_title">// MANUAL</h2>
     <div class="help-section">
-      <h3>KOLLEKTION / SERIE</h3>
-      <div class="help-row"><span class="help-icon">◈</span><span class="help-text"><b>Sidopanel</b> – välj serie till vänster för att filtrera robotar. "ALLA" visar allt.</span></div>
-      <div class="help-row"><span class="help-icon">+</span><span class="help-text"><b>NY SERIE</b> – lägg till ny kollektion (G2, Beast Wars etc.).</span></div>
-      <div class="help-row"><span class="help-icon">✕</span><span class="help-text"><b>Ta bort serie</b> – hovra på serien, klicka krysset. Robotarna flyttas till "okategoriserade".</span></div>
+      <h3 data-i18n="hs1">KOLLEKTION / SERIE</h3>
+      <div class="help-row"><span class="help-icon">◈</span><span class="help-text" data-i18n-html="hr1"><b>Sidopanel</b> – välj serie till vänster för att filtrera robotar. "ALLA" visar allt.</span></div>
+      <div class="help-row"><span class="help-icon">+</span><span class="help-text" data-i18n-html="hr2"><b>NY SERIE</b> – lägg till ny kollektion (G2, Beast Wars etc.).</span></div>
+      <div class="help-row"><span class="help-icon">✕</span><span class="help-text" data-i18n-html="hr3"><b>Ta bort serie</b> – hovra på serien, klicka krysset. Robotarna flyttas till "okategoriserade".</span></div>
     </div>
     <div class="help-section">
-      <h3>FILTRERA OCH SÖKA</h3>
-      <div class="help-row"><span class="help-icon">▶</span><span class="help-text"><b>Sökfältet</b> filtrerar på robotnamn, kategori eller combiner.</span></div>
-      <div class="help-row"><span class="help-icon">A/D</span><span class="help-text"><b>Fraktion</b> – visa bara Autobots eller Decepticons.</span></div>
-      <div class="help-row"><span class="help-icon">●</span><span class="help-text"><b>Status</b> – Komplett / Delvis / Saknas.</span></div>
-      <div class="help-row"><span class="help-icon">⬡</span><span class="help-text"><b>Typ</b> – combiner-robotar eller vanliga.</span></div>
+      <h3 data-i18n="hs2">FILTRERA OCH SÖKA</h3>
+      <div class="help-row"><span class="help-icon">▶</span><span class="help-text" data-i18n-html="hr4"><b>Sökfältet</b> filtrerar på robotnamn, kategori eller combiner.</span></div>
+      <div class="help-row"><span class="help-icon">A/D</span><span class="help-text" data-i18n-html="hr5"><b>Fraktion</b> – visa bara Autobots eller Decepticons.</span></div>
+      <div class="help-row"><span class="help-icon">●</span><span class="help-text" data-i18n-html="hr6"><b>Status</b> – Komplett / Delvis / Saknas.</span></div>
+      <div class="help-row"><span class="help-icon">⬡</span><span class="help-text" data-i18n-html="hr7"><b>Typ</b> – combiner-robotar eller vanliga.</span></div>
     </div>
     <div class="help-section">
-      <h3>ROBOTKORT</h3>
-      <div class="help-row"><span class="help-icon">📷</span><span class="help-text"><b>Robotbild</b> – hovra och klicka för att ladda upp.</span></div>
-      <div class="help-row"><span class="help-icon">A D</span><span class="help-text"><b>Fraktion</b> – klicka A/D för att sätta fraktion.</span></div>
-      <div class="help-row"><span class="help-icon">✏️</span><span class="help-text"><b>Redigera</b> – ändra namn, serie, fraktion, kategori etc.</span></div>
-      <div class="help-row"><span class="help-icon">✕</span><span class="help-text"><b>Ta bort robot</b> – raderar permanent.</span></div>
+      <h3 data-i18n="hs3">ROBOTKORT</h3>
+      <div class="help-row"><span class="help-icon">📷</span><span class="help-text" data-i18n-html="hr8"><b>Robotbild</b> – hovra och klicka för att ladda upp.</span></div>
+      <div class="help-row"><span class="help-icon">A D</span><span class="help-text" data-i18n-html="hr9"><b>Fraktion</b> – klicka A/D för att sätta fraktion.</span></div>
+      <div class="help-row"><span class="help-icon">✏️</span><span class="help-text" data-i18n-html="hr10"><b>Redigera</b> – ändra namn, serie, fraktion, kategori etc.</span></div>
+      <div class="help-row"><span class="help-icon">✕</span><span class="help-text" data-i18n-html="hr11"><b>Ta bort robot</b> – raderar permanent.</span></div>
     </div>
     <div class="help-section">
-      <h3>TILLBEHÖR</h3>
-      <div class="help-row"><span class="help-icon">− +</span><span class="help-text"><b>Bocka av</b> – minus minskar, plus ökar. Grönt = du har det.</span></div>
-      <div class="help-row"><span class="help-icon">⬡</span><span class="help-text"><b>Combiner-del</b> – lila streckad = tillhör kombinationsformen.</span></div>
-      <div class="help-row"><span class="help-icon">✕</span><span class="help-text"><b>Ta bort</b> – hovra, klicka röda krysset uppe till höger.</span></div>
+      <h3 data-i18n="hs4">TILLBEHÖR</h3>
+      <div class="help-row"><span class="help-icon">− +</span><span class="help-text" data-i18n-html="hr12"><b>Bocka av</b> – minus minskar, plus ökar. Grönt = du har det.</span></div>
+      <div class="help-row"><span class="help-icon">⬡</span><span class="help-text" data-i18n-html="hr13"><b>Combiner-del</b> – lila streckad = tillhör kombinationsformen.</span></div>
+      <div class="help-row"><span class="help-icon">✕</span><span class="help-text" data-i18n-html="hr14"><b>Ta bort</b> – hovra, klicka röda krysset uppe till höger.</span></div>
     </div>
     <div class="help-section">
-      <h3>ÖVRIGT</h3>
-      <div class="help-row"><span class="help-icon">⬇</span><span class="help-text"><b>PDF/CSV</b> – exporterar aktuell serie som PDF eller CSV (öppnas i Excel).</span></div>
-      <div class="help-row"><span class="help-icon">✓</span><span class="help-text"><b>ÄGER</b> – markera figurer du äger. Samlingsvärdet räknas bara på ägda figurer.</span></div>
-      <div class="help-row"><span class="help-icon">💾</span><span class="help-text"><b>BACKUP</b> – laddar ner en zip med databas + alla bilder. Spara den säkert!</span></div>
-      <div class="help-row"><span class="help-icon">💾</span><span class="help-text"><b>Backup</b> – kopiera tracker.db och images/-mappen.</span></div>
+      <h3 data-i18n="hs5">ÖVRIGT</h3>
+      <div class="help-row"><span class="help-icon">⬇</span><span class="help-text" data-i18n-html="hr15"><b>PDF/CSV</b> – exporterar aktuell serie som PDF eller CSV (öppnas i Excel).</span></div>
+      <div class="help-row"><span class="help-icon">✓</span><span class="help-text" data-i18n-html="hr16"><b>ÄGER</b> – markera figurer du äger. Samlingsvärdet räknas bara på ägda figurer.</span></div>
+      <div class="help-row"><span class="help-icon">💾</span><span class="help-text" data-i18n-html="hr17"><b>BACKUP</b> – laddar ner en zip med databas + alla bilder. Spara den säkert!</span></div>
+      <div class="help-row"><span class="help-icon">EN</span><span class="help-text" data-i18n-html="hr18"><b>EN/SV</b> – byter språk mellan svenska och engelska. Valet sparas.</span></div>
+      <div class="help-row"><span class="help-icon">⏻</span><span class="help-text" data-i18n-html="hr19"><b>⏻ Stäng av</b> – stänger av appen helt. Starta igen med genvägen.</span></div>
     </div>
     <div style="text-align:right;margin-top:8px">
-      <button class="btn-cancel" onclick="document.getElementById('helpModal').classList.remove('open')">STÄNG</button>
+      <button class="btn-cancel" onclick="document.getElementById('helpModal').classList.remove('open')" data-i18n="close">STÄNG</button>
     </div>
   </div>
 </div>
@@ -668,6 +670,122 @@ input[type=file]{display:none;}
 <input type="file" id="robotImgInput" accept="image/*">
 
 <script>
+
+
+// ── SPRÅK / LANGUAGE ──────────────────────────────────────────────────────
+let lang = localStorage.getItem('tf_lang') || 'sv';
+const I18N = {
+sv: {
+  search_ph:"SÖK ROBOT...", btn_add:"+ LÄGG TILL",
+  csv_title:"Exportera aktuell serie som CSV (Excel)", backup_title:"Ladda ner backup av hela samlingen",
+  shutdown_title:"Stäng av appen", logo_title:"Klicka för att byta logobild", change:"ÄNDRA",
+  sidebar_title:"// KOLLEKTION", btn_new_series:"+ NY SERIE", all_series:"ALLA SERIER", robots_lc:"robotar",
+  del_series_title:"Ta bort serie",
+  f_faction:"FRAKTION", f_owned:"ÄGD", f_status:"STATUS", f_type:"TYP", f_sort:"SORT",
+  all:"ALLA", owns:"ÄGER", owns_not:"ÄGER EJ", complete:"KOMPLETT", partial:"DELVIS", missing:"SAKNAS",
+  combiner:"COMBINER", regular:"VANLIG", standard:"STANDARD", az:"A–Ö",
+  empty_msg:"INGA ROBOTAR I DENNA SERIE.<br>KLICKA + LÄGG TILL FÖR ATT BÖRJA.",
+  robots_stat:"ROBOTAR", owned_stat:"ÄGDA", parts:"DELAR", has:"HAR", missing_stat:"SAKNAR", coll_value:"SAMLINGSVÄRDE",
+  own_yes:"✓ ÄGER", own_ask:"ÄGER?", own_yes_title:"Du äger denna", own_ask_title:"Markera som ägd",
+  edit_title:"Redigera", delete_title:"Ta bort",
+  acc_name_ph:"Tillbehörsnamn", size_ph:"Storlek", own_part:"Eget", combiner_part:"Combiner-del", add_btn:"+ LÄGG TILL",
+  h_add:"⊕ LÄGG TILL ROBOT", h_edit:"✏ REDIGERA ROBOT", h_new_series:"⊕ NY SERIE", h_edit_series:"✏ REDIGERA SERIE",
+  lbl_name:"NAMN *", lbl_faction:"FRAKTION", lbl_series:"SERIE", lbl_cat:"KATEGORI",
+  lbl_combiner:"COMBINER", lbl_instance:"EXEMPLAR #", i_own_this:"JAG ÄGER DENNA FIGUR",
+  lbl_value:"UPPSKATTAT VÄRDE (kr)", lbl_notes:"NOTERINGAR", lbl_short:"KORT NAMN", lbl_years:"ÅR",
+  choose:"— välj —", cancel:"AVBRYT", save:"SPARA", add:"LÄGG TILL", close:"STÄNG",
+  name_ph:"t.ex. Onslaught", combiner_ph:"t.ex. Bruticus", instance_ph:"t.ex. 1, 2 ...",
+  value_ph:"t.ex. 250", notes_ph:"t.ex. Köpt 2024, saknar vänster arm...",
+  sname_ph:"t.ex. Generation 1", sshort_ph:"t.ex. G1", syears_ph:"t.ex. 1984-1990",
+  confirm_del_robot:"Ta bort robot och alla tillbehör?",
+  confirm_del_series:'Ta bort serien "{name}"? Robotarna behålls men tappar sin serie.',
+  confirm_shutdown:"Stäng av TF Tracker?",
+  help_title:"// MANUAL",
+  hs1:"KOLLEKTION / SERIE", hs2:"FILTRERA OCH SÖKA", hs3:"ROBOTKORT", hs4:"TILLBEHÖR", hs5:"ÖVRIGT",
+  hr1:'<b>Sidopanel</b> – välj serie till vänster för att filtrera robotar. "ALLA" visar allt.',
+  hr2:"<b>NY SERIE</b> – lägg till ny kollektion (G2, Beast Wars etc.).",
+  hr3:'<b>Ta bort serie</b> – hovra på serien, klicka krysset. Robotarna flyttas till "okategoriserade".',
+  hr4:"<b>Sökfältet</b> filtrerar på robotnamn, kategori eller combiner.",
+  hr5:"<b>Fraktion</b> – visa bara Autobots eller Decepticons.",
+  hr6:"<b>Status</b> – Komplett / Delvis / Saknas.",
+  hr7:"<b>Typ</b> – combiner-robotar eller vanliga.",
+  hr8:"<b>Robotbild</b> – hovra och klicka för att ladda upp.",
+  hr9:"<b>Fraktion</b> – klicka A/D för att sätta fraktion.",
+  hr10:"<b>Redigera</b> – ändra namn, serie, fraktion, kategori etc.",
+  hr11:"<b>Ta bort robot</b> – raderar permanent.",
+  hr12:"<b>Bocka av</b> – minus minskar, plus ökar. Grönt = du har det.",
+  hr13:"<b>Combiner-del</b> – lila streckad = tillhör kombinationsformen.",
+  hr14:"<b>Ta bort</b> – hovra, klicka röda krysset uppe till höger.",
+  hr15:"<b>PDF/CSV</b> – exporterar aktuell serie som PDF eller CSV (öppnas i Excel).",
+  hr16:"<b>ÄGER</b> – markera figurer du äger. Samlingsvärdet räknas bara på ägda figurer.",
+  hr17:"<b>BACKUP</b> – laddar ner en zip med databas + alla bilder. Spara den säkert!",
+  hr18:"<b>EN/SV</b> – byter språk mellan svenska och engelska. Valet sparas.",
+  hr19:"<b>⏻ Stäng av</b> – stänger av appen helt. Starta igen med genvägen."
+},
+en: {
+  search_ph:"SEARCH ROBOT...", btn_add:"+ ADD",
+  csv_title:"Export current series as CSV (Excel)", backup_title:"Download a backup of your whole collection",
+  shutdown_title:"Shut down the app", logo_title:"Click to change logo image", change:"CHANGE",
+  sidebar_title:"// COLLECTION", btn_new_series:"+ NEW SERIES", all_series:"ALL SERIES", robots_lc:"robots",
+  del_series_title:"Delete series",
+  f_faction:"FACTION", f_owned:"OWNED", f_status:"STATUS", f_type:"TYPE", f_sort:"SORT",
+  all:"ALL", owns:"OWN", owns_not:"DON'T OWN", complete:"COMPLETE", partial:"PARTIAL", missing:"MISSING",
+  combiner:"COMBINER", regular:"REGULAR", standard:"DEFAULT", az:"A–Z",
+  empty_msg:"NO ROBOTS IN THIS SERIES.<br>CLICK + ADD TO GET STARTED.",
+  robots_stat:"ROBOTS", owned_stat:"OWNED", parts:"PARTS", has:"HAVE", missing_stat:"MISSING", coll_value:"COLLECTION VALUE",
+  own_yes:"✓ OWNED", own_ask:"OWN?", own_yes_title:"You own this", own_ask_title:"Mark as owned",
+  edit_title:"Edit", delete_title:"Delete",
+  acc_name_ph:"Accessory name", size_ph:"Size", own_part:"Own", combiner_part:"Combiner part", add_btn:"+ ADD",
+  h_add:"⊕ ADD ROBOT", h_edit:"✏ EDIT ROBOT", h_new_series:"⊕ NEW SERIES", h_edit_series:"✏ EDIT SERIES",
+  lbl_name:"NAME *", lbl_faction:"FACTION", lbl_series:"SERIES", lbl_cat:"CATEGORY",
+  lbl_combiner:"COMBINER", lbl_instance:"INSTANCE #", i_own_this:"I OWN THIS FIGURE",
+  lbl_value:"ESTIMATED VALUE (kr)", lbl_notes:"NOTES", lbl_short:"SHORT NAME", lbl_years:"YEARS",
+  choose:"— select —", cancel:"CANCEL", save:"SAVE", add:"ADD", close:"CLOSE",
+  name_ph:"e.g. Onslaught", combiner_ph:"e.g. Bruticus", instance_ph:"e.g. 1, 2 ...",
+  value_ph:"e.g. 250", notes_ph:"e.g. Bought 2024, missing left arm...",
+  sname_ph:"e.g. Generation 1", sshort_ph:"e.g. G1", syears_ph:"e.g. 1984-1990",
+  confirm_del_robot:"Delete robot and all accessories?",
+  confirm_del_series:'Delete series "{name}"? The robots are kept but lose their series.',
+  confirm_shutdown:"Shut down TF Tracker?",
+  help_title:"// MANUAL",
+  hs1:"COLLECTION / SERIES", hs2:"FILTER AND SEARCH", hs3:"ROBOT CARD", hs4:"ACCESSORIES", hs5:"OTHER",
+  hr1:'<b>Sidebar</b> – pick a series on the left to filter robots. "ALL" shows everything.',
+  hr2:"<b>NEW SERIES</b> – add a new collection (G2, Beast Wars etc.).",
+  hr3:'<b>Delete series</b> – hover the series, click the cross. Robots are moved to "uncategorized".',
+  hr4:"<b>Search field</b> filters by robot name, category or combiner.",
+  hr5:"<b>Faction</b> – show only Autobots or Decepticons.",
+  hr6:"<b>Status</b> – Complete / Partial / Missing.",
+  hr7:"<b>Type</b> – combiner robots or regular ones.",
+  hr8:"<b>Robot photo</b> – hover and click to upload.",
+  hr9:"<b>Faction</b> – click A/D to set faction.",
+  hr10:"<b>Edit</b> – change name, series, faction, category etc.",
+  hr11:"<b>Delete robot</b> – removes it permanently.",
+  hr12:"<b>Check off</b> – minus decreases, plus increases. Green = you have it.",
+  hr13:"<b>Combiner part</b> – purple dashed = belongs to the combined form.",
+  hr14:"<b>Delete</b> – hover, click the red cross in the top right.",
+  hr15:"<b>PDF/CSV</b> – exports the current series as PDF or CSV (opens in Excel).",
+  hr16:"<b>OWNED</b> – mark figures you own. Collection value only counts owned figures.",
+  hr17:"<b>BACKUP</b> – downloads a zip with the database + all photos. Keep it safe!",
+  hr18:"<b>EN/SV</b> – switches between Swedish and English. Your choice is saved.",
+  hr19:"<b>⏻ Shut down</b> – closes the app completely. Start again with the shortcut."
+}};
+function t(key) { return (I18N[lang] && I18N[lang][key]) || I18N.sv[key] || key; }
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = t(el.dataset.i18nPh));
+  document.querySelectorAll('[data-i18n-title]').forEach(el => el.title = t(el.dataset.i18nTitle));
+  const lb = document.getElementById('langBtn');
+  if (lb) lb.textContent = lang === 'sv' ? 'EN' : 'SV';
+}
+function toggleLang() {
+  lang = lang === 'sv' ? 'en' : 'sv';
+  localStorage.setItem('tf_lang', lang);
+  applyLang();
+  renderSidebar();
+  render();
+}
 
 let robots = [];
 let pendingImg = null;
@@ -706,6 +824,20 @@ function setSort(alpha, btn) {
   btn.closest('.filter-group').querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   render();
+}
+
+function updateStats(filtered) {
+  if (!filtered) {
+    filtered = robots.filter(matchesFilters);
+    if (sortAlpha) filtered = [...filtered].sort((a,b) => a.name.localeCompare(b.name, 'sv'));
+  }
+  const stats = document.getElementById('statsBar');
+  const totalAccs = filtered.reduce((s,r)=>s+r.accessories.length,0);
+  const haveAccs = filtered.reduce((s,r)=>s+r.accessories.filter(a=>a.have>0).length,0);
+  const ownedCount = filtered.filter(r=>r.owned).length;
+  const ownedValue = filtered.reduce((s,r)=>s+(r.owned ? (r.value||0) : 0),0);
+  const valueStr = ownedValue > 0 ? ` &nbsp;·&nbsp; <b style="color:var(--gold2)">${ownedValue.toLocaleString('sv-SE')} kr</b> ${t('coll_value')}` : '';
+  stats.innerHTML = `<b>${filtered.length}</b>/${robots.length} ${t('robots_stat')} &nbsp;·&nbsp; <b style="color:var(--green2)">${ownedCount}</b> ${t('owned_stat')} &nbsp;·&nbsp; <b>${totalAccs}</b> ${t('parts')} &nbsp;·&nbsp; <b style="color:var(--green2)">${haveAccs}</b> ${t('has')} &nbsp;·&nbsp; <b style="color:#FF6666">${totalAccs-haveAccs}</b> ${t('missing_stat')}${valueStr}`;
 }
 
 function matchesFilters(robot) {
@@ -749,19 +881,14 @@ function render() {
   if (!robots.length) { empty.style.display='block'; stats.style.display='none'; return; }
   empty.style.display = 'none';
 
-  const totalAccs = filtered.reduce((s,r)=>s+r.accessories.length,0);
-  const haveAccs = filtered.reduce((s,r)=>s+r.accessories.filter(a=>a.have>0).length,0);
   stats.style.display = 'flex';
-  const ownedCount = filtered.filter(r=>r.owned).length;
-  const ownedValue = filtered.reduce((s,r)=>s+(r.owned ? (r.value||0) : 0),0);
-  const valueStr = ownedValue > 0 ? ` &nbsp;·&nbsp; <b style="color:var(--gold2)">${ownedValue.toLocaleString('sv-SE')} kr</b> SAMLINGSVÄRDE` : '';
-  stats.innerHTML = `<b>${filtered.length}</b>/${robots.length} ROBOTAR &nbsp;·&nbsp; <b style="color:var(--green2)">${ownedCount}</b> ÄGDA &nbsp;·&nbsp; <b>${totalAccs}</b> DELAR &nbsp;·&nbsp; <b style="color:var(--green2)">${haveAccs}</b> HAR &nbsp;·&nbsp; <b style="color:#FF6666">${totalAccs-haveAccs}</b> SAKNAR${valueStr}`;
+  updateStats(filtered);
 
   filtered.forEach(robot => {
     const tc = robot.accessories.length;
     const hc = robot.accessories.filter(a=>a.have>0).length;
     let bc='badge-no', bt=`${hc}/${tc}`;
-    if(hc===tc && tc>0){bc='badge-ok';bt='KOMPLETT';}
+    if(hc===tc && tc>0){bc='badge-ok';bt=t('complete');}
     else if(hc>0) bc='badge-part';
 
     const faction = (robot.faction||'').toLowerCase();
@@ -777,8 +904,8 @@ function render() {
     card.innerHTML = `
       <div class="robot-header" onclick="toggleCard('${robot.id}')">
         <div class="robot-thumb" onclick="event.stopPropagation()">
-          ${imgSrc ? `<img src="${imgSrc}" alt="${robot.name}">` : `<span class="robot-thumb-placeholder">⚙</span>`}
-          <div class="thumb-upload" onclick="uploadRobotImg('${robot.id}')">ÄNDRA</div>
+          ${imgSrc ? `<img src="${imgSrc}" alt="${esc(robot.name)}">` : `<span class="robot-thumb-placeholder">⚙</span>`}
+          <div class="thumb-upload" onclick="uploadRobotImg('${robot.id}')">${t('change')}</div>
         </div>
         <div class="robot-info">
           <div class="robot-name">${esc(robot.name)}${inst}</div>
@@ -787,25 +914,25 @@ function render() {
             ${robot.combiner?`<span class="combiner-tag">⬡ ${robot.combiner}</span>`:''}
           </div>
         </div>
-        <button class="own-btn ${robot.owned?'owned':''}" onclick="event.stopPropagation();toggleOwned('${robot.id}')" title="${robot.owned?'Du äger denna':'Markera som ägd'}">${robot.owned?'✓ ÄGER':'ÄGER?'}</button>
+        <button class="own-btn ${robot.owned?'owned':''}" onclick="event.stopPropagation();toggleOwned('${robot.id}')" title="${robot.owned?t('own_yes_title'):t('own_ask_title')}">${robot.owned?t('own_yes'):t('own_ask')}</button>
         <div class="faction-toggle" onclick="event.stopPropagation()">
           <button class="ftog autobot ${faction==='autobot'?'active':''}" onclick="toggleFaction('${robot.id}','autobot')">A</button>
           <button class="ftog decepticon ${faction==='decepticon'?'active':''}" onclick="toggleFaction('${robot.id}','decepticon')">D</button>
         </div>
         <span class="badge ${bc}">${bt}</span>
-        ${robot.value > 0 ? `<span class="value-badge">~${robot.value} kr</span>` : ''}
+        ${robot.value > 0 ? `<span class="value-badge">~${robot.value.toLocaleString('sv-SE')} kr</span>` : ''}
         ${robot.notes ? `<span class="notes-preview" title="${esc(robot.notes)}">📝 ${esc(robot.notes)}</span>` : ''}
-        <button class="edit-robot" onclick="event.stopPropagation();openEditModal('${robot.id}')" title="Redigera">✏️</button>
-        <button class="del-robot" onclick="event.stopPropagation();deleteRobot('${robot.id}')" title="Ta bort">✕</button>
+        <button class="edit-robot" onclick="event.stopPropagation();openEditModal('${robot.id}')" title="${t('edit_title')}">✏️</button>
+        <button class="del-robot" onclick="event.stopPropagation();deleteRobot('${robot.id}')" title="${t('delete_title')}">✕</button>
         <span class="chevron">▼</span>
       </div>
       <div class="accessories">
         <div class="acc-grid">${robot.accessories.map(a=>accHTML(robot.id,a)).join('')}</div>
         <div class="add-acc-row">
-          <input placeholder="Tillbehörsnamn" id="an-${robot.id}">
-          <input placeholder="Storlek" id="as-${robot.id}" style="max-width:90px">
-          <select id="at-${robot.id}"><option value="0">Eget</option><option value="1">Combiner-del</option></select>
-          <button class="btn-add" onclick="addAcc('${robot.id}')">+ LÄGG TILL</button>
+          <input placeholder="${t('acc_name_ph')}" id="an-${robot.id}">
+          <input placeholder="${t('size_ph')}" id="as-${robot.id}" style="max-width:90px">
+          <select id="at-${robot.id}"><option value="0">${t('own_part')}</option><option value="1">${t('combiner_part')}</option></select>
+          <button class="btn-add" onclick="addAcc('${robot.id}')">${t('add_btn')}</button>
         </div>
       </div>`;
     list.appendChild(card);
@@ -860,7 +987,7 @@ async function toggleFaction(rid, faction) {
 }
 
 async function deleteRobot(rid) {
-  if(!confirm('Ta bort robot och alla tillbehör?')) return;
+  if(!confirm(t('confirm_del_robot'))) return;
   await api('DELETE', `/api/robots/${rid}`);
   robots = robots.filter(r=>r.id!==rid);
   render();
@@ -905,6 +1032,7 @@ async function changeHave(rid, aid, delta) {
   const item = document.getElementById('ac-' + aid);
   if(item) item.classList.toggle('have', a.have > 0);
   updateBadge(rid);
+  updateStats();
 }
 
 function updateBadge(rid) {
@@ -1030,11 +1158,12 @@ document.getElementById('logoInput').addEventListener('change', function() {
   this.value = '';
 });
 
+applyLang();
 loadLogo();
 init();
 
 async function shutdownApp() {
-  if (!confirm('Stäng av TF Tracker?')) return;
+  if (!confirm(t('confirm_shutdown'))) return;
   await fetch('/api/shutdown', { method: 'POST' });
   document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:Bebas Neue,sans-serif;background:#04040A;color:#CC1100"><div style=\'font-size:48px;letter-spacing:6px\'>TF TRACKER</div><div style=\'color:#666;font-size:16px;letter-spacing:3px;font-family:Share Tech Mono,monospace\'>OFFLINE</div></div>';
 }
@@ -1065,8 +1194,8 @@ function renderSidebar() {
   allItem.className = 'series-item all-item' + (activeSeries === 'all' ? ' active' : '');
   allItem.innerHTML = `
     <button class="series-item-btn" onclick="selectSeries('all')">
-      <span class="series-name">ALLA SERIER</span>
-      <span class="series-meta">${robots.length} robotar</span>
+      <span class="series-name">${t('all_series')}</span>
+      <span class="series-meta">${robots.length} ${t('robots_lc')}</span>
     </button>
     <span class="series-count">${robots.length}</span>`;
   list.appendChild(allItem);
@@ -1087,7 +1216,7 @@ function renderSidebar() {
         <span class="series-meta">${s.years || ''}</span>
       </button>
       <span class="series-count">${count}</span>
-      <button class="series-del" onclick="deleteSeries('${s.id}')" title="Ta bort serie">✕</button>`;
+      <button class="series-del" onclick="deleteSeries('${s.id}')" title="${t('del_series_title')}">✕</button>`;
     list.appendChild(item);
   });
 }
@@ -1102,7 +1231,7 @@ async function selectSeries(sid) {
 async function deleteSeries(sid) {
   const s = allSeries.find(x => x.id === sid);
   if (!s) return;
-  if (!confirm(`Ta bort serien "${s.name}"? Robotarna behålls men tappar sin serie.`)) return;
+  if (!confirm(t('confirm_del_series').replace('{name}', s.name))) return;
   await api('DELETE', `/api/series/${sid}`);
   if (activeSeries === sid) activeSeries = 'all';
   [allSeries, robots] = await Promise.all([
@@ -1119,12 +1248,12 @@ function openSeriesModal(sid) {
   editingSeriesId = sid || null;
   if (sid) {
     const s = allSeries.find(x => x.id === sid);
-    document.getElementById('seriesModalTitle').textContent = '✏ REDIGERA SERIE';
+    document.getElementById('seriesModalTitle').textContent = t('h_edit_series');
     document.getElementById('sName').value = s.name;
     document.getElementById('sShort').value = s.short_name;
     document.getElementById('sYears').value = s.years || '';
   } else {
-    document.getElementById('seriesModalTitle').textContent = '⊕ NY SERIE';
+    document.getElementById('seriesModalTitle').textContent = t('h_new_series');
     document.getElementById('sName').value = '';
     document.getElementById('sShort').value = '';
     document.getElementById('sYears').value = '';
@@ -1250,23 +1379,23 @@ openModal = function() {
 
 function exportCsv() {
   const url = activeSeries === 'all'
-    ? '/api/export/csv?series_id=all'
-    : `/api/export/csv?series_id=${activeSeries}`;
+    ? `/api/export/csv?series_id=all&lang=${lang}`
+    : `/api/export/csv?series_id=${activeSeries}&lang=${lang}`;
   window.location = url;
 }
 
 // ── PDF EXPORT with series ────────────────────────────────────────────────
 function exportPdf() {
   const url = activeSeries === 'all'
-    ? '/api/export/pdf'
-    : `/api/export/pdf?series_id=${activeSeries}`;
+    ? `/api/export/pdf?lang=${lang}`
+    : `/api/export/pdf?series_id=${activeSeries}&lang=${lang}`;
   window.location = url;
 }
 
 // ── OVERRIDE deleteRobot to refresh sidebar ───────────────────────────────
 const _origDeleteRobot = deleteRobot;
 deleteRobot = async function(rid) {
-  if (!confirm('Ta bort robot och alla tillbehör?')) return;
+  if (!confirm(t('confirm_del_robot'))) return;
   await api('DELETE', `/api/robots/${rid}`);
   [allSeries, robots] = await Promise.all([
     api('GET', '/api/series'),

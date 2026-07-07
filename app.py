@@ -211,11 +211,19 @@ def add_robot():
 @app.route('/api/robots/<rid>', methods=['PATCH'])
 def update_robot(rid):
     d = request.json
+    cur = get_db().execute("SELECT * FROM robots WHERE id=?", (rid,)).fetchone()
+    if not cur:
+        return jsonify({'error': 'Robot finns inte'}), 404
+    # Partial update: fält som inte skickas behåller sitt nuvarande värde
     get_db().execute(
         "UPDATE robots SET name=?, category=?, combiner=?, instance=?, faction=?, series_id=?, value=?, notes=?, owned=? WHERE id=?",
-        (d['name'], d.get('category',''), d.get('combiner',''),
-         d.get('instance',''), d.get('faction',''), d.get('series_id'),
-         d.get('value', 0), d.get('notes', ''), 1 if d.get('owned') else 0, rid)
+        (d.get('name', cur['name']), d.get('category', cur['category']),
+         d.get('combiner', cur['combiner']), d.get('instance', cur['instance']),
+         d.get('faction', cur['faction']),
+         d['series_id'] if 'series_id' in d else cur['series_id'],
+         d.get('value', cur['value']), d.get('notes', cur['notes']),
+         (1 if d['owned'] else 0) if 'owned' in d else cur['owned'],
+         rid)
     )
     get_db().commit()
     return jsonify({'ok': True})
@@ -356,15 +364,18 @@ def export_pdf():
     import io, datetime
 
     series_id = request.args.get('series_id')
+    lang = request.args.get('lang', 'sv')
+    L = {'sv': {'all': 'Alla serier', 'gen': 'Genererad', 'complete': 'Komplett'},
+         'en': {'all': 'All series', 'gen': 'Generated', 'complete': 'Complete'}}[lang if lang in ('sv','en') else 'sv']
     db = get_db()
 
     if series_id and series_id != 'all':
         robots = db.execute("SELECT * FROM robots WHERE series_id=? ORDER BY name", (series_id,)).fetchall()
         series_name = db.execute("SELECT name FROM series WHERE id=?", (series_id,)).fetchone()
-        series_label = series_name['name'] if series_name else 'Alla'
+        series_label = series_name['name'] if series_name else L['all']
     else:
         robots = db.execute("SELECT * FROM robots ORDER BY name").fetchall()
-        series_label = 'Alla serier'
+        series_label = L['all']
 
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4,
@@ -379,13 +390,13 @@ def export_pdf():
 
     elements = []
     elements.append(Paragraph(f'TF Tracker – {series_label}', title_style))
-    elements.append(Paragraph(f'Genererad: {datetime.date.today().strftime("%Y-%m-%d")}', meta_style))
+    elements.append(Paragraph(f'{L["gen"]}: {datetime.date.today().strftime("%Y-%m-%d")}', meta_style))
 
     for r in robots:
         accs = db.execute("SELECT * FROM accessories WHERE robot_id=? ORDER BY sort_order", (r['id'],)).fetchall()
         hc = len([a for a in accs if a['have'] > 0])
         tc = len(accs)
-        if hc == tc and tc > 0: status, sc = 'Komplett', colors.HexColor('#2e7d32')
+        if hc == tc and tc > 0: status, sc = L['complete'], colors.HexColor('#2e7d32')
         elif hc > 0:             status, sc = f'{hc}/{tc}', colors.HexColor('#f57f17')
         elif tc == 0:            status, sc = '–', colors.grey
         else:                    status, sc = f'0/{tc}', colors.HexColor('#c62828')
@@ -478,13 +489,20 @@ def export_csv():
     acc_map = {}
     for a in db.execute("SELECT robot_id, COUNT(*) as tot, SUM(CASE WHEN have>0 THEN 1 ELSE 0 END) as have FROM accessories GROUP BY robot_id").fetchall():
         acc_map[a['robot_id']] = (a['tot'], a['have'])
+    lang = request.args.get('lang', 'sv')
+    if lang == 'en':
+        header = ['Series','Name','Category','Faction','Combiner','Instance','Owned','Value (kr)','Accessories total','Accessories have','Notes']
+        yes, no = 'Yes', 'No'
+    else:
+        header = ['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar']
+        yes, no = 'Ja', 'Nej'
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=';')
-    w.writerow(['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar'])
+    w.writerow(header)
     for r in robots:
         tot, have = acc_map.get(r['id'], (0, 0))
         w.writerow([r['series_name'] or '', r['name'], r['category'] or '', (r['faction'] or '').capitalize(),
-                    r['combiner'] or '', r['instance'] or '', 'Ja' if r['owned'] else 'Nej',
+                    r['combiner'] or '', r['instance'] or '', yes if r['owned'] else no,
                     r['value'] or 0, tot, have or 0, r['notes'] or ''])
     from flask import Response
     safe = label.replace(' ', '_').replace('/', '-')
