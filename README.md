@@ -16,6 +16,7 @@ Built for collectors who want full control of their data without cloud services 
 
 - **18 series** pre-loaded — G1 through Titans Return (2,420 figures)
 - Mark figures as **owned** — separate your collection from the full catalog
+- **Condition tracking** — Loose / Boxed / MIB / MISB per figure, shown as badges and in statistics
 - **Completion bars** per series in the sidebar — see how far you've come (87/344)
 - **Statistics view** — collection value, completion per series, most valuable figures, faction split
 - **Bulk edit** — mark all filtered figures as owned in one click

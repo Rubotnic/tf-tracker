@@ -54,6 +54,7 @@ def init_db():
             notes       TEXT DEFAULT '',
             owned       INTEGER DEFAULT 0,
             wishlist    INTEGER DEFAULT 0,
+            condition   TEXT DEFAULT '',
             created_at  TEXT DEFAULT (datetime('now'))
         );
 
@@ -113,6 +114,7 @@ def init_db():
         "ALTER TABLE robots ADD COLUMN notes TEXT DEFAULT ''",
         "ALTER TABLE robots ADD COLUMN owned INTEGER DEFAULT 0",
         "ALTER TABLE robots ADD COLUMN wishlist INTEGER DEFAULT 0",
+        "ALTER TABLE robots ADD COLUMN condition TEXT DEFAULT ''",
     ]:
         try: db.execute(sql)
         except: pass
@@ -203,10 +205,11 @@ def add_robot():
     rid = str(uuid.uuid4())
     max_order = get_db().execute("SELECT COALESCE(MAX(sort_order),0) FROM robots").fetchone()[0]
     get_db().execute(
-        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes,owned) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes,owned,condition) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
         (rid, d['name'], d.get('category',''), d.get('combiner',''),
          d.get('instance',''), max_order+1, d.get('faction',''), d.get('series_id'),
-         d.get('value', 0) or 0, d.get('notes', ''), 1 if d.get('owned') else 0)
+         d.get('value', 0) or 0, d.get('notes', ''), 1 if d.get('owned') else 0,
+         d.get('condition', ''))
     )
     get_db().commit()
     return jsonify({'id': rid})
@@ -228,6 +231,8 @@ def update_robot(rid):
          (1 if d['owned'] else 0) if 'owned' in d else cur['owned'],
          rid)
     )
+    if 'condition' in d:
+        get_db().execute("UPDATE robots SET condition=? WHERE id=?", (d['condition'] or '', rid))
     if 'wishlist' in d:
         get_db().execute("UPDATE robots SET wishlist=? WHERE id=?",
                          (1 if d['wishlist'] else 0, rid))
@@ -531,10 +536,10 @@ def export_csv():
         acc_map[a['robot_id']] = (a['tot'], a['have'])
     lang = request.args.get('lang', 'sv')
     if lang == 'en':
-        header = ['Series','Name','Category','Faction','Combiner','Instance','Owned','Wishlist','Value (kr)','Accessories total','Accessories have','Notes']
+        header = ['Series','Name','Category','Faction','Combiner','Instance','Owned','Wishlist','Condition','Value (kr)','Accessories total','Accessories have','Notes']
         yes, no = 'Yes', 'No'
     else:
-        header = ['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Onskelista','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar']
+        header = ['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Onskelista','Skick','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar']
         yes, no = 'Ja', 'Nej'
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=';')
@@ -544,6 +549,7 @@ def export_csv():
         w.writerow([r['series_name'] or '', r['name'], r['category'] or '', (r['faction'] or '').capitalize(),
                     r['combiner'] or '', r['instance'] or '', yes if r['owned'] else no,
                     yes if r['wishlist'] else no,
+                    (r['condition'] or '').upper(),
                     r['value'] or 0, tot, have or 0, r['notes'] or ''])
     from flask import Response
     safe = label.replace(' ', '_').replace('/', '-')

@@ -484,6 +484,12 @@ input[type=file]{display:none;}
 }
 .own-btn.owned{border-color:var(--green2);color:var(--green2);background:rgba(0,200,80,.08);}
 .own-btn:hover{border-color:var(--green2);color:var(--green2);}
+.cond-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  border-radius:2px;padding:2px 6px;white-space:nowrap;flex-shrink:0;border:1px solid;}
+.cond-loose{color:var(--muted);border-color:var(--border2);background:rgba(255,255,255,.03);}
+.cond-boxed{color:#5AA9FF;border-color:rgba(90,169,255,.35);background:rgba(90,169,255,.08);}
+.cond-mib{color:#C77DFF;border-color:rgba(199,125,255,.35);background:rgba(199,125,255,.08);}
+.cond-misb{color:var(--gold2,#FFB800);border-color:rgba(255,184,0,.45);background:rgba(255,184,0,.1);box-shadow:0 0 6px rgba(255,184,0,.15);}
 .value-badge{
   font-family:'Share Tech Mono',monospace;font-size:10px;
   color:var(--gold2);background:rgba(255,184,0,.08);
@@ -655,6 +661,14 @@ input[type=file]{display:none;}
     </select>
     <label data-i18n="lbl_combiner">COMBINER</label><input id="mCombiner" data-i18n-ph="combiner_ph" placeholder="t.ex. Bruticus">
     <label data-i18n="lbl_instance">EXEMPLAR #</label><input id="mInstance" data-i18n-ph="instance_ph" placeholder="t.ex. 1, 2 ...">
+    <label data-i18n="lbl_cond">SKICK</label>
+    <select id="mCond">
+      <option value="" data-i18n="cond_none">— ej angivet —</option>
+      <option value="loose" data-i18n="cond_loose">LÖS</option>
+      <option value="boxed" data-i18n="cond_boxed">MED KARTONG</option>
+      <option value="mib" data-i18n="cond_mib">MIB</option>
+      <option value="misb" data-i18n="cond_misb">MISB</option>
+    </select>
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:10px">
       <input type="checkbox" id="mOwned" style="width:16px;height:16px;accent-color:var(--green2)"> <span data-i18n="i_own_this">JAG ÄGER DENNA FIGUR</span>
     </label>
@@ -699,6 +713,14 @@ input[type=file]{display:none;}
     </select>
     <label data-i18n="lbl_combiner">COMBINER</label><input id="eCombiner" data-i18n-ph="combiner_ph" placeholder="t.ex. Bruticus">
     <label data-i18n="lbl_instance">EXEMPLAR #</label><input id="eInstance" data-i18n-ph="instance_ph" placeholder="t.ex. 1, 2 ...">
+    <label data-i18n="lbl_cond">SKICK</label>
+    <select id="eCond">
+      <option value="" data-i18n="cond_none">— ej angivet —</option>
+      <option value="loose" data-i18n="cond_loose">LÖS</option>
+      <option value="boxed" data-i18n="cond_boxed">MED KARTONG</option>
+      <option value="mib" data-i18n="cond_mib">MIB</option>
+      <option value="misb" data-i18n="cond_misb">MISB</option>
+    </select>
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:10px">
       <input type="checkbox" id="eOwned" style="width:16px;height:16px;accent-color:var(--green2)"> <span data-i18n="i_own_this">JAG ÄGER DENNA FIGUR</span>
     </label>
@@ -768,6 +790,7 @@ input[type=file]{display:none;}
       <div class="help-row"><span class="help-icon">A+</span><span class="help-text" data-i18n-html="hr24"><b>A+</b> – växlar till större text i hela appen. Valet sparas.</span></div>
       <div class="help-row"><span class="help-icon">📊</span><span class="help-text" data-i18n-html="hr20"><b>📊 Statistik</b> – översikt av samlingen: värde, komplettering per serie, toppfigurer.</span></div>
       <div class="help-row"><span class="help-icon">⇉</span><span class="help-text" data-i18n-html="hr21"><b>Massändra</b> – markera alla synliga (filtrerade) robotar som ägda/ej ägda på en gång.</span></div>
+      <div class="help-row"><span class="help-icon">◆</span><span class="help-text" data-i18n-html="hr25"><b>SKICK</b> – ange Lös / Med kartong / MIB / MISB per figur. Syns som märke på kortet och i statistiken.</span></div>
       <div class="help-row"><span class="help-icon">⭐</span><span class="help-text" data-i18n-html="hr22"><b>⭐ Önskelista</b> – stjärnmärk figurer du jagar. Filtrera fram dem och ta med listan till Tradera.</span></div>
     </div>
     <div style="text-align:right;margin-top:8px">
@@ -866,6 +889,9 @@ sv: {
   autobots:"Autobots", decepticons:"Decepticons", others:"Övriga",
   filters_btn:"FILTER", clear:"RENSA ALLA", no_series:"— ingen serie —",
   view_img:"VISA", add_img:"+ BILD", change_img:"BYT BILD", remove_img:"TA BORT BILD",
+  lbl_cond:"SKICK", cond_none:"— ej angivet —", cond_loose:"LÖS", cond_boxed:"MED KARTONG",
+  cond_mib:"MIB", cond_misb:"MISB", st_cond:"SKICK (ÄGDA)",
+  hr25:"<b>SKICK</b> – ange Lös / Med kartong / MIB / MISB per figur. Syns som märke på kortet och i statistiken.",
   confirm_del_img:"Ta bort bilden?", toast_img_removed:"Bild borttagen",
   font_on:"Större text", font_off:"Normal textstorlek",
   export_btn:"EXPORT", backup_item:"BACKUP (zip)",
@@ -938,6 +964,9 @@ en: {
   autobots:"Autobots", decepticons:"Decepticons", others:"Other",
   filters_btn:"FILTERS", clear:"CLEAR ALL", no_series:"— no series —",
   view_img:"VIEW", add_img:"+ PHOTO", change_img:"CHANGE PHOTO", remove_img:"REMOVE PHOTO",
+  lbl_cond:"CONDITION", cond_none:"— not set —", cond_loose:"LOOSE", cond_boxed:"BOXED",
+  cond_mib:"MIB", cond_misb:"MISB", st_cond:"CONDITION (OWNED)",
+  hr25:"<b>CONDITION</b> – set Loose / Boxed / MIB / MISB per figure. Shows as a badge on the card and in statistics.",
   confirm_del_img:"Remove this photo?", toast_img_removed:"Photo removed",
   font_on:"Larger text", font_off:"Normal text size",
   export_btn:"EXPORT", backup_item:"BACKUP (zip)",
@@ -1234,6 +1263,7 @@ function render() {
           <button class="ftog decepticon ${faction==='decepticon'?'active':''}" onclick="toggleFaction('${robot.id}','decepticon')">D</button>
         </div>
         <span class="badge ${bc}">${bt}</span>
+        ${robot.condition ? `<span class="cond-badge cond-${robot.condition}">${t('cond_' + robot.condition)}</span>` : ''}
         ${robot.value > 0 ? `<span class="value-badge">~${robot.value.toLocaleString('sv-SE')} kr</span>` : ''}
         ${robot.notes ? `<span class="notes-preview" title="${esc(robot.notes)}">📝 ${esc(robot.notes)}</span>` : ''}
         <button class="edit-robot" onclick="event.stopPropagation();openEditModal('${robot.id}')" title="${t('edit_title')}">✏️</button>
@@ -1356,6 +1386,11 @@ async function openStats() {
     <div class="stats-row"><span class="n" style="color:var(--autobot,#CC1100)">${t('autobots')}</span><span class="bar"><span class="fill" style="width:${owned.length?Math.round(auto/owned.length*100):0}%;display:block;background:var(--autobot,#CC1100)"></span></span><span class="pct">${auto}</span></div>
     <div class="stats-row"><span class="n" style="color:var(--decepticon,#7A00CC)">${t('decepticons')}</span><span class="bar"><span class="fill" style="width:${owned.length?Math.round(dec/owned.length*100):0}%;display:block;background:var(--decepticon,#7A00CC)"></span></span><span class="pct">${dec}</span></div>
     ${other ? `<div class="stats-row"><span class="n">${t('others')}</span><span class="bar"></span><span class="pct">${other}</span></div>` : ''}
+    <div class="stats-h">${t('st_cond')}</div>
+    ${['misb','mib','boxed','loose'].map(cnd => {
+      const n = owned.filter(r => r.condition === cnd).length;
+      return n ? `<div class="stats-row"><span class="n"><span class="cond-badge cond-${cnd}">${t('cond_'+cnd)}</span></span><span class="bar"><span class="fill" style="width:${Math.round(n/owned.length*100)}%;display:block"></span></span><span class="pct">${n}</span></div>` : '';
+    }).join('') || `<div class="stats-row"><span class="n" style="color:var(--muted)">${t('st_none')}</span></div>`}
     <div class="stats-h">${t('st_top')}</div>
     ${topRows}
     <div class="stats-h">${t('st_completion')}</div>
@@ -1480,6 +1515,7 @@ function openModal() {
   modalFaction = '';
   ['mName','mCombiner','mInstance','mValue','mNotes'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('mOwned').checked = false;
+  document.getElementById('mCond').value = '';
   document.getElementById('mCat').value='';
   selectFaction('');
   document.getElementById('modal').classList.add('open');
@@ -1714,7 +1750,8 @@ addRobot = async function() {
     series_id: document.getElementById('mSeries').value || null,
     value: parseFloat(document.getElementById('mValue').value) || 0,
     notes: document.getElementById('mNotes').value.trim(),
-    owned: document.getElementById('mOwned').checked
+    owned: document.getElementById('mOwned').checked,
+    condition: document.getElementById('mCond').value
   });
   closeModal();
   showToast(t('toast_added').replace('{name}', name));
@@ -1740,7 +1777,8 @@ saveRobot = async function() {
     series_id: document.getElementById('eSeries').value || null,
     value: parseFloat(document.getElementById('eValue').value) || 0,
     notes: document.getElementById('eNotes').value.trim(),
-    owned: document.getElementById('eOwned').checked
+    owned: document.getElementById('eOwned').checked,
+    condition: document.getElementById('eCond').value
   });
   closeEditModal();
   showToast(t('toast_saved'));
@@ -1762,6 +1800,7 @@ openEditModal = function(rid) {
     document.getElementById('eValue').value = r.value || '';
     document.getElementById('eNotes').value = r.notes || '';
     document.getElementById('eOwned').checked = !!r.owned;
+    document.getElementById('eCond').value = r.condition || '';
   }
 };
 

@@ -24,7 +24,7 @@ def seed():
             sort_order INTEGER DEFAULT 0, open INTEGER DEFAULT 0,
             img_file TEXT, faction TEXT DEFAULT "",
             series_id TEXT REFERENCES series(id),
-            value REAL DEFAULT 0, notes TEXT DEFAULT "",
+            value REAL DEFAULT 0, notes TEXT DEFAULT "", owned INTEGER DEFAULT 0, wishlist INTEGER DEFAULT 0, condition TEXT DEFAULT "",
             created_at TEXT DEFAULT (datetime("now")));
         CREATE TABLE IF NOT EXISTS accessories (
             id TEXT PRIMARY KEY,
