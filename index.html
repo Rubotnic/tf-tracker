@@ -454,8 +454,18 @@ input[type=file]{display:none;}
 .wish-btn:hover{border-color:var(--gold2);color:var(--gold2);}
 .series-progress{height:2px;background:rgba(255,255,255,.06);border-radius:1px;margin-top:3px;overflow:hidden;}
 .series-progress-fill{height:100%;background:var(--green2);border-radius:1px;transition:width .3s;}
+.lightbox-box{background:#0A0A14;border:1px solid var(--border2);border-top:2px solid var(--gold);
+  border-radius:4px;max-width:640px;width:92%;padding:18px 22px;text-align:center;}
+.lightbox-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold2,#FFB800);
+  letter-spacing:3px;margin-bottom:12px;}
+#lbImg{max-width:100%;max-height:60vh;object-fit:contain;border:1px solid var(--border2);
+  border-radius:3px;background:rgba(255,255,255,.02);}
+.lightbox-btns{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.lb-remove{border-color:rgba(255,51,0,.4) !important;color:var(--red2,#FF3300) !important;}
+.lb-remove:hover{border-color:var(--red2,#FF3300) !important;box-shadow:0 0 8px rgba(255,51,0,.3);}
 .stats-modal{background:var(--panel,#0A0A14);border:1px solid var(--border2);border-top:2px solid var(--gold);
   border-radius:4px;max-width:560px;width:92%;max-height:85vh;overflow-y:auto;padding:22px 26px;}
+.stats-modal h2{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold2,#FFB800);letter-spacing:3px;margin:0 0 4px;}
 .stats-big{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0;}
 .stats-card{flex:1;min-width:130px;background:rgba(255,255,255,.03);border:1px solid var(--border2);
   border-radius:3px;padding:12px;text-align:center;}
@@ -766,6 +776,19 @@ input[type=file]{display:none;}
   </div>
 </div>
 
+<!-- Image lightbox -->
+<div class="overlay" id="imgLightbox" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="lightbox-box">
+    <div class="lightbox-title" id="lbTitle"></div>
+    <img id="lbImg" src="" alt="">
+    <div class="lightbox-btns">
+      <button class="btn-secondary" onclick="lbChange()"><span data-i18n="change_img">BYT BILD</span></button>
+      <button class="btn-secondary lb-remove" onclick="lbRemove()"><span data-i18n="remove_img">TA BORT BILD</span></button>
+      <button class="btn-cancel" onclick="document.getElementById('imgLightbox').classList.remove('open')" data-i18n="close">STÄNG</button>
+    </div>
+  </div>
+</div>
+
 <!-- Stats modal -->
 <div class="overlay" id="statsModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="stats-modal" id="statsContent"></div>
@@ -815,7 +838,7 @@ sv: {
   hr5:"<b>Fraktion</b> – visa bara Autobots eller Decepticons.",
   hr6:"<b>Status</b> – Komplett / Delvis / Saknas.",
   hr7:"<b>Typ</b> – combiner-robotar eller vanliga.",
-  hr8:"<b>Robotbild</b> – hovra och klicka för att ladda upp.",
+  hr8:"<b>Robotbild</b> – klicka för att se den stort, byta eller ta bort. Saknas bild laddar klicket upp en ny.",
   hr9:"<b>Fraktion</b> – klicka A/D för att sätta fraktion.",
   hr10:"<b>Redigera</b> – ändra namn, serie, fraktion, kategori etc.",
   hr11:"<b>Ta bort robot</b> – raderar permanent.",
@@ -841,7 +864,9 @@ sv: {
   st_wish:"PÅ ÖNSKELISTAN", st_completion:"KOMPLETTERING PER SERIE",
   st_top:"MEST VÄRDEFULLA (ÄGDA)", st_split:"FRAKTIONER (ÄGDA)", st_none:"– inga än –",
   autobots:"Autobots", decepticons:"Decepticons", others:"Övriga",
-  filters_btn:"FILTER", clear:"RENSA ALLA",
+  filters_btn:"FILTER", clear:"RENSA ALLA", no_series:"— ingen serie —",
+  view_img:"VISA", add_img:"+ BILD", change_img:"BYT BILD", remove_img:"TA BORT BILD",
+  confirm_del_img:"Ta bort bilden?", toast_img_removed:"Bild borttagen",
   font_on:"Större text", font_off:"Normal textstorlek",
   export_btn:"EXPORT", backup_item:"BACKUP (zip)",
   toast_saved:"✓ Sparad", toast_added:"✓ {name} tillagd", toast_deleted:"Borttagen",
@@ -885,7 +910,7 @@ en: {
   hr5:"<b>Faction</b> – show only Autobots or Decepticons.",
   hr6:"<b>Status</b> – Complete / Partial / Missing.",
   hr7:"<b>Type</b> – combiner robots or regular ones.",
-  hr8:"<b>Robot photo</b> – hover and click to upload.",
+  hr8:"<b>Robot photo</b> – click to view it large, change or remove it. No photo yet? Clicking uploads one.",
   hr9:"<b>Faction</b> – click A/D to set faction.",
   hr10:"<b>Edit</b> – change name, series, faction, category etc.",
   hr11:"<b>Delete robot</b> – removes it permanently.",
@@ -911,7 +936,9 @@ en: {
   st_wish:"ON WISHLIST", st_completion:"COMPLETION BY SERIES",
   st_top:"MOST VALUABLE (OWNED)", st_split:"FACTIONS (OWNED)", st_none:"– none yet –",
   autobots:"Autobots", decepticons:"Decepticons", others:"Other",
-  filters_btn:"FILTERS", clear:"CLEAR ALL",
+  filters_btn:"FILTERS", clear:"CLEAR ALL", no_series:"— no series —",
+  view_img:"VIEW", add_img:"+ PHOTO", change_img:"CHANGE PHOTO", remove_img:"REMOVE PHOTO",
+  confirm_del_img:"Remove this photo?", toast_img_removed:"Photo removed",
   font_on:"Larger text", font_off:"Normal text size",
   export_btn:"EXPORT", backup_item:"BACKUP (zip)",
   toast_saved:"✓ Saved", toast_added:"✓ {name} added", toast_deleted:"Deleted",
@@ -954,6 +981,7 @@ function toggleLang() {
   applyLang();
   applyFontSize();
   renderSidebar();
+  populateSeriesSelects();
   updateFilterUI();
   render();
 }
@@ -1005,6 +1033,29 @@ function showToast(msg) {
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2600);
 }
 
+let lightboxRobotId = null;
+function openLightbox(rid) {
+  const r = robots.find(x => x.id === rid);
+  if (!r || !r.img_file) return;
+  lightboxRobotId = rid;
+  document.getElementById('lbTitle').textContent = r.name;
+  document.getElementById('lbImg').src = `/images/${r.img_file}?t=${Date.now()}`;
+  document.getElementById('imgLightbox').classList.add('open');
+}
+function lbChange() {
+  document.getElementById('imgLightbox').classList.remove('open');
+  uploadRobotImg(lightboxRobotId);
+}
+async function lbRemove() {
+  if (!confirm(t('confirm_del_img'))) return;
+  await api('DELETE', `/api/robots/${lightboxRobotId}/image`);
+  const r = robots.find(x => x.id === lightboxRobotId);
+  if (r) r.img_file = null;
+  document.getElementById('imgLightbox').classList.remove('open');
+  render();
+  showToast(t('toast_img_removed'));
+}
+
 function toggleExportMenu(e) {
   e.stopPropagation();
   document.getElementById('exportMenu').classList.toggle('open');
@@ -1013,6 +1064,15 @@ function closeExportMenu() {
   document.getElementById('exportMenu').classList.remove('open');
 }
 document.addEventListener('click', () => closeExportMenu());
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['statsModal','helpModal','modal','seriesModal','imgLightbox'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('open');
+    });
+    closeExportMenu();
+  }
+});
 
 function doBackup() {
   window.location = '/api/backup';
@@ -1156,9 +1216,9 @@ function render() {
 
     card.innerHTML = `
       <div class="robot-header" onclick="toggleCard('${robot.id}')">
-        <div class="robot-thumb" onclick="event.stopPropagation()">
+        <div class="robot-thumb" onclick="event.stopPropagation();${imgSrc ? `openLightbox('${robot.id}')` : `uploadRobotImg('${robot.id}')`}">
           ${imgSrc ? `<img src="${imgSrc}" alt="${esc(robot.name)}">` : `<span class="robot-thumb-placeholder">⚙</span>`}
-          <div class="thumb-upload" onclick="uploadRobotImg('${robot.id}')">${t('change')}</div>
+          <div class="thumb-upload">${imgSrc ? t('view_img') : t('add_img')}</div>
         </div>
         <div class="robot-info">
           <div class="robot-name">${esc(robot.name)}${inst}</div>
@@ -1632,7 +1692,7 @@ function populateSeriesSelects() {
   ['mSeries', 'eSeries'].forEach(id => {
     const sel = document.getElementById(id);
     const cur = sel.value;
-    sel.innerHTML = '<option value="">— ingen serie —</option>' +
+    sel.innerHTML = `<option value="">${t('no_series')}</option>` +
       allSeries.map(s => `<option value="${s.id}">${s.name} ${s.years ? '(' + s.years + ')' : ''}</option>`).join('');
     if (cur) sel.value = cur;
     // Default to active series

@@ -14,7 +14,7 @@ Built for collectors who want full control of their data without cloud services 
 
 ## Features
 
-- **18 series** pre-loaded — G1 through Titans Return (2,400+ figures)
+- **18 series** pre-loaded — G1 through Titans Return (2,420 figures)
 - Mark figures as **owned** — separate your collection from the full catalog
 - **Completion bars** per series in the sidebar — see how far you've come (87/344)
 - **Statistics view** — collection value, completion per series, most valuable figures, faction split
@@ -26,8 +26,7 @@ Built for collectors who want full control of their data without cloud services 
 - Set an estimated value per figure — see your collection's total value (owned figures only)
 - Personal notes per figure (purchase info, condition, missing parts...)
 - Sidebar navigation between collections
-- PDF and CSV (Excel) export per series
-- One-click backup — downloads a zip with your database and all photos
+- **EXPORT menu** — PDF and CSV (Excel) per series, plus one-click backup (zip with database and all photos)
 - Interface in **Swedish or English** — switch anytime with the EN/SV button
 - **Compact filter panel** — active filters show as removable tags, one click to clear
 - **Larger text mode** — scale up the whole interface with the A+ button
@@ -94,7 +93,7 @@ All your collection data is stored locally on your computer — nothing is sent 
 | All figures, accessories, status | `tracker.db` |
 | All uploaded photos | `images/` folder |
 
-> **Backup tip:** Click the **💾 BACKUP** button in the app — it downloads a zip with your database and all photos. You can also copy `tracker.db` and the `images/` folder manually.
+> **Backup tip:** Open the **EXPORT** menu in the app and choose **BACKUP** — it downloads a zip with your database and all photos. You can also copy `tracker.db` and the `images/` folder manually.
 
 > If you ever delete `tracker.db` by mistake, run `python seed.py` to recreate it with all figures.
 

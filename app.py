@@ -229,8 +229,11 @@ def update_robot(rid):
          rid)
     )
     if 'wishlist' in d:
-        get_db().execute("UPDATE robots SET wishlist=? WHERE id=?", (1 if d['wishlist'] else 0, rid)
-    )
+        get_db().execute("UPDATE robots SET wishlist=? WHERE id=?",
+                         (1 if d['wishlist'] else 0, rid))
+    if d.get('owned'):
+        # Ägd figur behöver inte önskas längre (samma logik som ÄGER-knappen)
+        get_db().execute("UPDATE robots SET wishlist=0 WHERE id=?", (rid,))
     get_db().commit()
     return jsonify({'ok': True})
 
@@ -271,11 +274,14 @@ def bulk_owned():
     if not isinstance(ids, list) or not ids:
         return jsonify({'error': 'Inga robotar angivna'}), 400
     db = get_db()
-    ph = ','.join('?' * len(ids))
-    if owned:
-        db.execute(f"UPDATE robots SET owned=1, wishlist=0 WHERE id IN ({ph})", ids)
-    else:
-        db.execute(f"UPDATE robots SET owned=0 WHERE id IN ({ph})", ids)
+    # Batcha för äldre SQLite-versioner (max 999 variabler per query)
+    for i in range(0, len(ids), 500):
+        chunk = ids[i:i+500]
+        ph = ','.join('?' * len(chunk))
+        if owned:
+            db.execute(f"UPDATE robots SET owned=1, wishlist=0 WHERE id IN ({ph})", chunk)
+        else:
+            db.execute(f"UPDATE robots SET owned=0 WHERE id IN ({ph})", chunk)
     db.commit()
     return jsonify({'updated': len(ids)})
 
