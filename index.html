@@ -216,10 +216,31 @@ header::after{
 /* ── FILTER BAR ─────────────────────────────────────────────────────────── */
 #filterBar{
   background:rgba(8,8,20,.95);border-bottom:1px solid var(--border);
-  padding:5px 14px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex-shrink:0;
+  padding:10px 16px;display:flex;gap:8px;row-gap:12px;flex-wrap:wrap;align-items:center;flex-shrink:0;
 }
-.filter-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-right:2px;}
+.filter-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold2,#FFB800);letter-spacing:2px;text-transform:uppercase;margin-right:4px;padding-left:8px;border-left:2px solid var(--red2,#FF3300);line-height:1.4;}
 .filter-group{display:flex;gap:3px;align-items:center;}
+#filterToolbar{display:flex;align-items:center;gap:8px;padding:8px 16px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border2);}
+#filterToggle{display:flex;align-items:center;gap:6px;background:transparent;
+  border:1px solid var(--border2);color:var(--text);padding:5px 12px;border-radius:2px;
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+#filterToggle:hover,#filterToggle.open{border-color:var(--red2,#FF3300);color:var(--red2,#FF3300);}
+#filterToggle .ft-arrow{transition:transform .2s;font-size:8px;}
+#filterToggle.open .ft-arrow{transform:rotate(180deg);}
+#filterCount{background:var(--red2,#FF3300);color:#fff;border-radius:8px;padding:0 6px;
+  font-size:9px;line-height:14px;display:none;}
+#filterCount.show{display:inline-block;}
+#activeChips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.chip{display:flex;align-items:center;gap:5px;background:rgba(255,51,0,.08);
+  border:1px solid rgba(255,51,0,.3);color:var(--text);border-radius:2px;padding:3px 8px;
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;transition:all .15s;}
+.chip:hover{border-color:var(--red2,#FF3300);}
+.chip .x{color:var(--red2,#FF3300);font-size:10px;}
+#clearFilters{background:transparent;border:none;color:var(--muted);
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;text-decoration:underline;}
+#clearFilters:hover{color:var(--red2,#FF3300);}
+#filterBar.collapsed{display:none;}
 .divider{width:1px;height:14px;background:var(--border2);margin:0 6px;}
 .fbtn{
   background:transparent;border:1px solid var(--border);color:var(--muted);
@@ -397,6 +418,28 @@ header::after{
 .help-text b{color:var(--text);}
 
 input[type=file]{display:none;}
+.wish-btn{
+  background:transparent;border:1px solid var(--border2);color:var(--muted);
+  width:26px;height:24px;border-radius:2px;font-size:12px;cursor:pointer;
+  transition:all .2s;flex-shrink:0;line-height:1;
+}
+.wish-btn.wished{border-color:var(--gold2);color:var(--gold2);background:rgba(255,184,0,.08);}
+.wish-btn:hover{border-color:var(--gold2);color:var(--gold2);}
+.series-progress{height:2px;background:rgba(255,255,255,.06);border-radius:1px;margin-top:3px;overflow:hidden;}
+.series-progress-fill{height:100%;background:var(--green2);border-radius:1px;transition:width .3s;}
+.stats-modal{background:var(--panel,#0A0A14);border:1px solid var(--border2);border-top:2px solid var(--gold);
+  border-radius:4px;max-width:560px;width:92%;max-height:85vh;overflow-y:auto;padding:22px 26px;}
+.stats-big{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0;}
+.stats-card{flex:1;min-width:130px;background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:3px;padding:12px;text-align:center;}
+.stats-card .num{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold2);letter-spacing:1px;}
+.stats-card .lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.stats-h{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red2,#FF3300);letter-spacing:2px;margin:16px 0 8px;}
+.stats-row{display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;margin:4px 0;}
+.stats-row .n{flex:0 0 170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stats-row .bar{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.stats-row .fill{height:100%;background:var(--green2);border-radius:3px;}
+.stats-row .pct{flex:0 0 76px;text-align:right;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);}
 .own-btn{
   background:transparent;border:1px solid var(--border2);color:var(--muted);
   min-width:52px;height:24px;border-radius:2px;font-family:'Share Tech Mono',monospace;
@@ -451,6 +494,8 @@ input[type=file]{display:none;}
   <button class="btn-secondary" id="pdfBtn" onclick="exportPdf()">⬇ PDF</button>
   <button class="btn-secondary" onclick="exportCsv()" data-i18n-title="csv_title" title="Exportera aktuell serie som CSV (Excel)">⬇ CSV</button>
   <button class="btn-secondary" onclick="window.location='/api/backup'" data-i18n-title="backup_title" title="Ladda ner backup av hela samlingen">💾 BACKUP</button>
+  <button class="btn-secondary" onclick="openStats()" data-i18n-title="stats_title_btn" title="Visa statistik">📊</button>
+  <button class="btn-secondary" id="fontBtn" onclick="toggleFontSize()" title="Större text" style="min-width:38px">A+</button>
   <button class="btn-secondary" id="langBtn" onclick="toggleLang()" title="Byt språk / Switch language" style="min-width:38px">EN</button>
   <button class="help-btn" onclick="document.getElementById('helpModal').classList.add('open')">?</button>
   <button class="shutdown-btn" onclick="shutdownApp()" data-i18n-title="shutdown_title" title="Stäng av appen">⏻</button>
@@ -469,40 +514,59 @@ input[type=file]{display:none;}
 
   <!-- MAIN CONTENT -->
   <div id="content">
-    <div id="filterBar">
+    <div id="filterToolbar">
+      <button id="filterToggle" onclick="toggleFilterPanel()">
+        <span data-i18n="filters_btn">FILTER</span><span id="filterCount"></span><span class="ft-arrow">▾</span>
+      </button>
+      <div id="activeChips"></div>
+      <button id="clearFilters" onclick="clearAllFilters()" data-i18n="clear" style="display:none">RENSA</button>
+    </div>
+    <div id="filterBar" class="collapsed">
       <span class="filter-label" data-i18n="f_faction">FRAKTION</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('faction','all',this)" data-i18n="all">ALLA</button>
-        <button class="fbtn f-autobot" onclick="setFilter('faction','autobot',this)">AUTOBOTS</button>
-        <button class="fbtn f-decepticon" onclick="setFilter('faction','decepticon',this)">DECEPTICONS</button>
+        <button class="fbtn f-all active" onclick="setFilter('faction','all',this)" data-f="faction" data-v="all" data-i18n="all">ALLA</button>
+        <button class="fbtn f-autobot" onclick="setFilter('faction','autobot',this)" data-f="faction" data-v="autobot">AUTOBOTS</button>
+        <button class="fbtn f-decepticon" onclick="setFilter('faction','decepticon',this)" data-f="faction" data-v="decepticon">DECEPTICONS</button>
       </div>
       <div class="divider"></div>
       <span class="filter-label" data-i18n="f_owned">ÄGD</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('owned','all',this)" data-i18n="all">ALLA</button>
-        <button class="fbtn f-ok" onclick="setFilter('owned','ja',this)" data-i18n="owns">ÄGER</button>
-        <button class="fbtn f-no" onclick="setFilter('owned','nej',this)" data-i18n="owns_not">ÄGER EJ</button>
+        <button class="fbtn f-all active" onclick="setFilter('owned','all',this)" data-f="owned" data-v="all" data-i18n="all">ALLA</button>
+        <button class="fbtn f-ok" onclick="setFilter('owned','ja',this)" data-f="owned" data-v="ja" data-i18n="owns">ÄGER</button>
+        <button class="fbtn f-no" onclick="setFilter('owned','nej',this)" data-f="owned" data-v="nej" data-i18n="owns_not">ÄGER EJ</button>
       </div>
       <div class="divider"></div>
       <span class="filter-label" data-i18n="f_status">STATUS</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('status','all',this)" data-i18n="all">ALLA</button>
-        <button class="fbtn f-ok"   onclick="setFilter('status','komplett',this)" data-i18n="complete">KOMPLETT</button>
-        <button class="fbtn f-part" onclick="setFilter('status','har',this)" data-i18n="partial">DELVIS</button>
-        <button class="fbtn f-no"   onclick="setFilter('status','saknar',this)" data-i18n="missing">SAKNAS</button>
+        <button class="fbtn f-all active" onclick="setFilter('status','all',this)" data-f="status" data-v="all" data-i18n="all">ALLA</button>
+        <button class="fbtn f-ok"   onclick="setFilter('status','komplett',this)" data-f="status" data-v="komplett" data-i18n="complete">KOMPLETT</button>
+        <button class="fbtn f-part" onclick="setFilter('status','har',this)" data-f="status" data-v="har" data-i18n="partial">DELVIS</button>
+        <button class="fbtn f-no"   onclick="setFilter('status','saknar',this)" data-f="status" data-v="saknar" data-i18n="missing">SAKNAS</button>
       </div>
       <div class="divider"></div>
       <span class="filter-label" data-i18n="f_type">TYP</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setFilter('combiner','all',this)" data-i18n="all">ALLA</button>
-        <button class="fbtn f-all" onclick="setFilter('combiner','ja',this)">COMBINER</button>
-        <button class="fbtn f-all" onclick="setFilter('combiner','nej',this)" data-i18n="regular">VANLIG</button>
+        <button class="fbtn f-all active" onclick="setFilter('combiner','all',this)" data-f="combiner" data-v="all" data-i18n="all">ALLA</button>
+        <button class="fbtn f-all" onclick="setFilter('combiner','ja',this)" data-f="combiner" data-v="ja">COMBINER</button>
+        <button class="fbtn f-all" onclick="setFilter('combiner','nej',this)" data-f="combiner" data-v="nej" data-i18n="regular">VANLIG</button>
+      </div>
+      <div class="divider"></div>
+      <span class="filter-label" data-i18n="f_wish">ÖNSKELISTA</span>
+      <div class="filter-group">
+        <button class="fbtn f-all active" onclick="setFilter('wishlist','all',this)" data-f="wishlist" data-v="all" data-i18n="all">ALLA</button>
+        <button class="fbtn f-part" onclick="setFilter('wishlist','ja',this)" data-f="wishlist" data-v="ja" data-i18n="wish_only">⭐ ÖNSKAS</button>
       </div>
       <div class="divider"></div>
       <span class="filter-label" data-i18n="f_sort">SORT</span>
       <div class="filter-group">
-        <button class="fbtn f-all active" onclick="setSort(false,this)" data-i18n="standard">STANDARD</button>
-        <button class="fbtn f-all" onclick="setSort(true,this)" data-i18n="az">A–Ö</button>
+        <button class="fbtn f-all active" onclick="setSort(false,this)" data-sort="0" data-i18n="standard">STANDARD</button>
+        <button class="fbtn f-all" onclick="setSort(true,this)" data-sort="1" data-i18n="az">A–Ö</button>
+      </div>
+      <div class="divider"></div>
+      <span class="filter-label" data-i18n="bulk_label">MASSÄNDRA SYNLIGA</span>
+      <div class="filter-group">
+        <button class="fbtn f-ok" onclick="bulkOwned(true)" data-i18n="bulk_own">ÄGER</button>
+        <button class="fbtn f-no" onclick="bulkOwned(false)" data-i18n="bulk_unown">ÄGER EJ</button>
       </div>
     </div>
 
@@ -634,6 +698,7 @@ input[type=file]{display:none;}
     <div class="help-section">
       <h3 data-i18n="hs2">FILTRERA OCH SÖKA</h3>
       <div class="help-row"><span class="help-icon">▶</span><span class="help-text" data-i18n-html="hr4"><b>Sökfältet</b> filtrerar på robotnamn, kategori eller combiner.</span></div>
+      <div class="help-row"><span class="help-icon">⚙</span><span class="help-text" data-i18n-html="hr23"><b>FILTER-knappen</b> – öppnar filterpanelen. Aktiva filter visas som röda taggar – klicka på en tagg för att ta bort den.</span></div>
       <div class="help-row"><span class="help-icon">A/D</span><span class="help-text" data-i18n-html="hr5"><b>Fraktion</b> – visa bara Autobots eller Decepticons.</span></div>
       <div class="help-row"><span class="help-icon">●</span><span class="help-text" data-i18n-html="hr6"><b>Status</b> – Komplett / Delvis / Saknas.</span></div>
       <div class="help-row"><span class="help-icon">⬡</span><span class="help-text" data-i18n-html="hr7"><b>Typ</b> – combiner-robotar eller vanliga.</span></div>
@@ -658,11 +723,20 @@ input[type=file]{display:none;}
       <div class="help-row"><span class="help-icon">💾</span><span class="help-text" data-i18n-html="hr17"><b>BACKUP</b> – laddar ner en zip med databas + alla bilder. Spara den säkert!</span></div>
       <div class="help-row"><span class="help-icon">EN</span><span class="help-text" data-i18n-html="hr18"><b>EN/SV</b> – byter språk mellan svenska och engelska. Valet sparas.</span></div>
       <div class="help-row"><span class="help-icon">⏻</span><span class="help-text" data-i18n-html="hr19"><b>⏻ Stäng av</b> – stänger av appen helt. Starta igen med genvägen.</span></div>
+      <div class="help-row"><span class="help-icon">A+</span><span class="help-text" data-i18n-html="hr24"><b>A+</b> – växlar till större text i hela appen. Valet sparas.</span></div>
+      <div class="help-row"><span class="help-icon">📊</span><span class="help-text" data-i18n-html="hr20"><b>📊 Statistik</b> – översikt av samlingen: värde, komplettering per serie, toppfigurer.</span></div>
+      <div class="help-row"><span class="help-icon">⇉</span><span class="help-text" data-i18n-html="hr21"><b>Massändra</b> – markera alla synliga (filtrerade) robotar som ägda/ej ägda på en gång.</span></div>
+      <div class="help-row"><span class="help-icon">⭐</span><span class="help-text" data-i18n-html="hr22"><b>⭐ Önskelista</b> – stjärnmärk figurer du jagar. Filtrera fram dem och ta med listan till Tradera.</span></div>
     </div>
     <div style="text-align:right;margin-top:8px">
       <button class="btn-cancel" onclick="document.getElementById('helpModal').classList.remove('open')" data-i18n="close">STÄNG</button>
     </div>
   </div>
+</div>
+
+<!-- Stats modal -->
+<div class="overlay" id="statsModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="stats-modal" id="statsContent"></div>
 </div>
 
 <input type="file" id="imgInput" accept="image/*">
@@ -720,7 +794,26 @@ sv: {
   hr16:"<b>ÄGER</b> – markera figurer du äger. Samlingsvärdet räknas bara på ägda figurer.",
   hr17:"<b>BACKUP</b> – laddar ner en zip med databas + alla bilder. Spara den säkert!",
   hr18:"<b>EN/SV</b> – byter språk mellan svenska och engelska. Valet sparas.",
-  hr19:"<b>⏻ Stäng av</b> – stänger av appen helt. Starta igen med genvägen."
+  hr19:"<b>⏻ Stäng av</b> – stänger av appen helt. Starta igen med genvägen.",
+  hr20:"<b>📊 Statistik</b> – översikt av samlingen: värde, komplettering per serie, toppfigurer.",
+  hr21:"<b>Massändra</b> – markera alla synliga (filtrerade) robotar som ägda/ej ägda på en gång.",
+  hr22:"<b>⭐ Önskelista</b> – stjärnmärk figurer du jagar. Filtrera fram dem och ta med listan till Tradera.",
+  f_wish:"ÖNSKELISTA", wish_only:"⭐ ÖNSKAS",
+  wl_on:"På önskelistan – klicka för att ta bort", wl_off:"Lägg på önskelistan",
+  bulk_label:"MASSÄNDRA SYNLIGA", bulk_own:"ÄGER", bulk_unown:"ÄGER EJ",
+  bulk_own_confirm:"Markera {n} synliga robotar som ägda?",
+  bulk_unown_confirm:"Avmarkera {n} synliga robotar som ägda?",
+  bulk_none:"Inga robotar matchar filtren.",
+  stats_title_btn:"Visa statistik",
+  st_title:"// STATISTIK", st_owned:"ÄGDA FIGURER", st_value:"SAMLINGSVÄRDE",
+  st_wish:"PÅ ÖNSKELISTAN", st_completion:"KOMPLETTERING PER SERIE",
+  st_top:"MEST VÄRDEFULLA (ÄGDA)", st_split:"FRAKTIONER (ÄGDA)", st_none:"– inga än –",
+  autobots:"Autobots", decepticons:"Decepticons", others:"Övriga",
+  filters_btn:"FILTER", clear:"RENSA ALLA",
+  font_on:"Större text", font_off:"Normal textstorlek",
+  hr24:"<b>A+</b> – växlar till större text i hela appen. Valet sparas.",
+  fv_autobot:"AUTOBOTS", fv_decepticon:"DECEPTICONS",
+  hr23:"<b>FILTER-knappen</b> – öppnar filterpanelen. Aktiva filter visas som röda taggar – klicka på en tagg för att ta bort den."
 },
 en: {
   search_ph:"SEARCH ROBOT...", btn_add:"+ ADD",
@@ -767,7 +860,26 @@ en: {
   hr16:"<b>OWNED</b> – mark figures you own. Collection value only counts owned figures.",
   hr17:"<b>BACKUP</b> – downloads a zip with the database + all photos. Keep it safe!",
   hr18:"<b>EN/SV</b> – switches between Swedish and English. Your choice is saved.",
-  hr19:"<b>⏻ Shut down</b> – closes the app completely. Start again with the shortcut."
+  hr19:"<b>⏻ Shut down</b> – closes the app completely. Start again with the shortcut.",
+  hr20:"<b>📊 Statistics</b> – collection overview: value, completion per series, top figures.",
+  hr21:"<b>Bulk edit</b> – mark all visible (filtered) robots as owned/not owned at once.",
+  hr22:"<b>⭐ Wishlist</b> – star figures you're hunting. Filter them out and bring the list to fairs.",
+  f_wish:"WISHLIST", wish_only:"⭐ WISHED",
+  wl_on:"On wishlist – click to remove", wl_off:"Add to wishlist",
+  bulk_label:"BULK EDIT VISIBLE", bulk_own:"OWN", bulk_unown:"DON'T OWN",
+  bulk_own_confirm:"Mark {n} visible robots as owned?",
+  bulk_unown_confirm:"Unmark {n} visible robots as owned?",
+  bulk_none:"No robots match the filters.",
+  stats_title_btn:"Show statistics",
+  st_title:"// STATISTICS", st_owned:"OWNED FIGURES", st_value:"COLLECTION VALUE",
+  st_wish:"ON WISHLIST", st_completion:"COMPLETION BY SERIES",
+  st_top:"MOST VALUABLE (OWNED)", st_split:"FACTIONS (OWNED)", st_none:"– none yet –",
+  autobots:"Autobots", decepticons:"Decepticons", others:"Other",
+  filters_btn:"FILTERS", clear:"CLEAR ALL",
+  font_on:"Larger text", font_off:"Normal text size",
+  hr24:"<b>A+</b> – switches the whole app to larger text. Your choice is saved.",
+  fv_autobot:"AUTOBOTS", fv_decepticon:"DECEPTICONS",
+  hr23:"<b>FILTERS button</b> – opens the filter panel. Active filters show as red tags – click a tag to remove it."
 }};
 function t(key) { return (I18N[lang] && I18N[lang][key]) || I18N.sv[key] || key; }
 function applyLang() {
@@ -779,11 +891,30 @@ function applyLang() {
   const lb = document.getElementById('langBtn');
   if (lb) lb.textContent = lang === 'sv' ? 'EN' : 'SV';
 }
+let bigFont = localStorage.getItem('tf_bigfont') === '1';
+function applyFontSize() {
+  document.documentElement.style.zoom = bigFont ? '1.15' : '';
+  const b = document.getElementById('fontBtn');
+  if (b) {
+    b.classList.toggle('active-font', bigFont);
+    b.style.borderColor = bigFont ? 'var(--gold2,#FFB800)' : '';
+    b.style.color = bigFont ? 'var(--gold2,#FFB800)' : '';
+    b.title = t(bigFont ? 'font_off' : 'font_on');
+  }
+}
+function toggleFontSize() {
+  bigFont = !bigFont;
+  localStorage.setItem('tf_bigfont', bigFont ? '1' : '0');
+  applyFontSize();
+}
+
 function toggleLang() {
   lang = lang === 'sv' ? 'en' : 'sv';
   localStorage.setItem('tf_lang', lang);
   applyLang();
+  applyFontSize();
   renderSidebar();
+  updateFilterUI();
   render();
 }
 
@@ -793,7 +924,7 @@ let pendingRobotImg = null;
 let modalFaction = '';
 let editingRobotId = null;
 let editFaction = '';
-let filters = { owned: 'all', faction: 'all', status: 'all', combiner: 'all' };
+let filters = { wishlist: 'all', owned: 'all', faction: 'all', status: 'all', combiner: 'all' };
 let sortAlpha = false;
 
 function esc(s) {
@@ -808,7 +939,7 @@ async function api(method, path, body, isFormData) {
 }
 
 async function init() {
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 }
 
@@ -816,6 +947,57 @@ function setFilter(type, value, btn) {
   filters[type] = value;
   btn.closest('.filter-group').querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  updateFilterUI();
+  render();
+}
+
+function toggleFilterPanel() {
+  const bar = document.getElementById('filterBar');
+  const btn = document.getElementById('filterToggle');
+  bar.classList.toggle('collapsed');
+  btn.classList.toggle('open', !bar.classList.contains('collapsed'));
+}
+
+const CHIP_KEYS = {
+  faction:  { autobot: 'fv_autobot', decepticon: 'fv_decepticon' },
+  owned:    { ja: 'owns', nej: 'owns_not' },
+  status:   { komplett: 'complete', har: 'partial', saknar: 'missing' },
+  combiner: { ja: 'combiner', nej: 'regular' },
+  wishlist: { ja: 'wish_only' }
+};
+
+function updateFilterUI() {
+  const active = Object.entries(filters).filter(([k, v]) => v !== 'all');
+  const count = document.getElementById('filterCount');
+  count.textContent = active.length;
+  count.classList.toggle('show', active.length > 0);
+  const chips = document.getElementById('activeChips');
+  chips.innerHTML = active.map(([k, v]) => {
+    const key = (CHIP_KEYS[k] || {})[v];
+    return `<span class="chip" onclick="clearOneFilter('${k}')">${key ? t(key) : v}<span class="x">✕</span></span>`;
+  }).join('');
+  document.getElementById('clearFilters').style.display = active.length ? '' : 'none';
+}
+
+function syncFilterButtons() {
+  Object.entries(filters).forEach(([k, v]) => {
+    document.querySelectorAll(`[data-f="${k}"]`).forEach(b => {
+      b.classList.toggle('active', b.dataset.v === v);
+    });
+  });
+}
+
+function clearOneFilter(key) {
+  filters[key] = 'all';
+  syncFilterButtons();
+  updateFilterUI();
+  render();
+}
+
+function clearAllFilters() {
+  Object.keys(filters).forEach(k => filters[k] = 'all');
+  syncFilterButtons();
+  updateFilterUI();
   render();
 }
 
@@ -849,6 +1031,9 @@ function matchesFilters(robot) {
     const f = (robot.faction||'').toLowerCase();
     if (filters.faction === 'autobot' && f !== 'autobot') return false;
     if (filters.faction === 'decepticon' && f !== 'decepticon') return false;
+  }
+  if (filters.wishlist !== 'all') {
+    if (filters.wishlist === 'ja' && !robot.wishlist) return false;
   }
   if (filters.owned !== 'all') {
     if (filters.owned === 'ja' && !robot.owned) return false;
@@ -914,6 +1099,7 @@ function render() {
             ${robot.combiner?`<span class="combiner-tag">⬡ ${robot.combiner}</span>`:''}
           </div>
         </div>
+        <button class="wish-btn ${robot.wishlist?'wished':''}" onclick="event.stopPropagation();toggleWishlist('${robot.id}')" title="${robot.wishlist?t('wl_on'):t('wl_off')}">${robot.wishlist?'★':'☆'}</button>
         <button class="own-btn ${robot.owned?'owned':''}" onclick="event.stopPropagation();toggleOwned('${robot.id}')" title="${robot.owned?t('own_yes_title'):t('own_ask_title')}">${robot.owned?t('own_yes'):t('own_ask')}</button>
         <div class="faction-toggle" onclick="event.stopPropagation()">
           <button class="ftog autobot ${faction==='autobot'?'active':''}" onclick="toggleFaction('${robot.id}','autobot')">A</button>
@@ -970,12 +1156,85 @@ async function toggleCard(rid) {
   render();
 }
 
+async function refreshSeries() {
+  allSeries = await api('GET', '/api/series');
+  renderSidebar();
+  populateSeriesSelects();
+}
+
 async function toggleOwned(rid) {
   const r = robots.find(x => x.id === rid);
   if (!r) return;
   r.owned = r.owned ? 0 : 1;
+  if (r.owned) r.wishlist = 0;
+  // Uppdatera sidopanelens räknare direkt
+  const s = allSeries.find(x => x.id === r.series_id);
+  if (s) { s.owned_count = (s.owned_count || 0) + (r.owned ? 1 : -1); renderSidebar(); }
   await api('PATCH', `/api/robots/${rid}/owned`, { owned: r.owned });
   render();
+}
+
+async function toggleWishlist(rid) {
+  const r = robots.find(x => x.id === rid);
+  if (!r) return;
+  r.wishlist = r.wishlist ? 0 : 1;
+  await api('PATCH', `/api/robots/${rid}/wishlist`, { wishlist: r.wishlist });
+  render();
+}
+
+async function bulkOwned(owned) {
+  const visible = robots.filter(matchesFilters);
+  const targets = visible.filter(r => (r.owned ? 1 : 0) !== (owned ? 1 : 0));
+  if (!targets.length) { alert(t('bulk_none')); return; }
+  const msg = t(owned ? 'bulk_own_confirm' : 'bulk_unown_confirm').replace('{n}', targets.length);
+  if (!confirm(msg)) return;
+  await api('POST', '/api/robots/bulk_owned', { ids: targets.map(r => r.id), owned });
+  targets.forEach(r => { r.owned = owned ? 1 : 0; if (owned) r.wishlist = 0; });
+  await refreshSeries();
+  render();
+}
+
+async function openStats() {
+  const [series, all] = await Promise.all([
+    api('GET', '/api/series'),
+    api('GET', '/api/robots')
+  ]);
+  const owned = all.filter(r => r.owned);
+  const totVal = owned.reduce((s, r) => s + (r.value || 0), 0);
+  const wish = all.filter(r => r.wishlist).length;
+  const auto = owned.filter(r => (r.faction || '').toLowerCase() === 'autobot').length;
+  const dec = owned.filter(r => (r.faction || '').toLowerCase() === 'decepticon').length;
+  const other = owned.length - auto - dec;
+  const top = [...owned].filter(r => r.value > 0).sort((a, b) => b.value - a.value).slice(0, 5);
+
+  const compRows = series.map(s => {
+    const tot = s.robot_count || 0, own = s.owned_count || 0;
+    const pct = tot ? Math.round(own / tot * 100) : 0;
+    return `<div class="stats-row"><span class="n">${esc(s.name)}</span><span class="bar"><span class="fill" style="width:${pct}%;display:block"></span></span><span class="pct">${own}/${tot} · ${pct}%</span></div>`;
+  }).join('');
+  const topRows = top.length
+    ? top.map(r => `<div class="stats-row"><span class="n">${esc(r.name)}</span><span class="bar"></span><span class="pct">${(r.value||0).toLocaleString('sv-SE')} kr</span></div>`).join('')
+    : `<div class="stats-row"><span class="n" style="color:var(--muted)">${t('st_none')}</span></div>`;
+
+  document.getElementById('statsContent').innerHTML = `
+    <h2>${t('st_title')}</h2>
+    <div class="stats-big">
+      <div class="stats-card"><div class="num">${owned.length}/${all.length}</div><div class="lbl">${t('st_owned')}</div></div>
+      <div class="stats-card"><div class="num">${totVal.toLocaleString('sv-SE')} kr</div><div class="lbl">${t('st_value')}</div></div>
+      <div class="stats-card"><div class="num">${wish}</div><div class="lbl">${t('st_wish')}</div></div>
+    </div>
+    <div class="stats-h">${t('st_split')}</div>
+    <div class="stats-row"><span class="n" style="color:var(--autobot,#CC1100)">${t('autobots')}</span><span class="bar"><span class="fill" style="width:${owned.length?Math.round(auto/owned.length*100):0}%;display:block;background:var(--autobot,#CC1100)"></span></span><span class="pct">${auto}</span></div>
+    <div class="stats-row"><span class="n" style="color:var(--decepticon,#7A00CC)">${t('decepticons')}</span><span class="bar"><span class="fill" style="width:${owned.length?Math.round(dec/owned.length*100):0}%;display:block;background:var(--decepticon,#7A00CC)"></span></span><span class="pct">${dec}</span></div>
+    ${other ? `<div class="stats-row"><span class="n">${t('others')}</span><span class="bar"></span><span class="pct">${other}</span></div>` : ''}
+    <div class="stats-h">${t('st_top')}</div>
+    ${topRows}
+    <div class="stats-h">${t('st_completion')}</div>
+    ${compRows}
+    <div style="text-align:right;margin-top:14px">
+      <button class="btn-cancel" onclick="document.getElementById('statsModal').classList.remove('open')">${t('close')}</button>
+    </div>`;
+  document.getElementById('statsModal').classList.add('open');
 }
 
 async function toggleFaction(rid, faction) {
@@ -998,7 +1257,7 @@ async function addRobot() {
   if(!name) { document.getElementById('mName').focus(); return; }
   await api('POST', '/api/robots', { name, category: document.getElementById('mCat').value, combiner: document.getElementById('mCombiner').value.trim(), instance: document.getElementById('mInstance').value.trim(), faction: modalFaction });
   closeModal();
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 }
 
@@ -1008,7 +1267,7 @@ async function addAcc(rid) {
   await api('POST', `/api/robots/${rid}/accessories`, { name, size: document.getElementById(`as-${rid}`).value.trim(), combiner_part: document.getElementById(`at-${rid}`).value === '1' });
   document.getElementById(`an-${rid}`).value='';
   document.getElementById(`as-${rid}`).value='';
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 }
 
@@ -1059,7 +1318,7 @@ document.getElementById('robotImgInput').addEventListener('change', async functi
   fd.append('image', this.files[0]);
   await api('POST', `/api/robots/${pendingRobotImg}/image`, fd, true);
   pendingRobotImg = null; this.value = '';
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 });
 
@@ -1069,7 +1328,7 @@ function uploadImg(aid) {
 }
 async function removeImg(rid, aid) {
   await api('DELETE', `/api/accessories/${aid}/image`);
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 }
 document.getElementById('imgInput').addEventListener('change', async function() {
@@ -1078,7 +1337,7 @@ document.getElementById('imgInput').addEventListener('change', async function() 
   fd.append('image', this.files[0]);
   await api('POST', `/api/accessories/${pendingImg}/image`, fd, true);
   pendingImg = null; this.value = '';
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 });
 
@@ -1127,7 +1386,7 @@ async function saveRobot() {
   if(!name) { document.getElementById('eName').focus(); return; }
   await api('PATCH', `/api/robots/${editingRobotId}`, { name, category: document.getElementById('eCat').value, combiner: document.getElementById('eCombiner').value.trim(), instance: document.getElementById('eInstance').value.trim(), faction: editFaction });
   closeEditModal();
-  robots = await api('GET', '/api/robots');
+  robots = await api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`);
   render();
 }
 document.getElementById('editModal').addEventListener('keydown', e=>{ if(e.key==='Enter') saveRobot(); if(e.key==='Escape') closeEditModal(); });
@@ -1159,6 +1418,7 @@ document.getElementById('logoInput').addEventListener('change', function() {
 });
 
 applyLang();
+applyFontSize();
 loadLogo();
 init();
 
@@ -1192,12 +1452,15 @@ function renderSidebar() {
   // "Alla" item
   const allItem = document.createElement('div');
   allItem.className = 'series-item all-item' + (activeSeries === 'all' ? ' active' : '');
+  const grandTotal = allSeries.reduce((s,x)=>s+(x.robot_count||0),0);
+  const grandOwned = allSeries.reduce((s,x)=>s+(x.owned_count||0),0);
   allItem.innerHTML = `
     <button class="series-item-btn" onclick="selectSeries('all')">
       <span class="series-name">${t('all_series')}</span>
-      <span class="series-meta">${robots.length} ${t('robots_lc')}</span>
+      <span class="series-meta">${grandOwned}/${grandTotal} ${t('robots_lc')}</span>
+      <div class="series-progress"><div class="series-progress-fill" style="width:${grandTotal?Math.round(grandOwned/grandTotal*100):0}%"></div></div>
     </button>
-    <span class="series-count">${robots.length}</span>`;
+    <span class="series-count">${grandOwned}/${grandTotal}</span>`;
   list.appendChild(allItem);
 
   // Divider
@@ -1207,15 +1470,17 @@ function renderSidebar() {
 
   // Series items
   allSeries.forEach(s => {
-    const count = robots.filter(r => r.series_id === s.id).length;
+    const total = s.robot_count || 0;
+    const owned = s.owned_count || 0;
     const item = document.createElement('div');
     item.className = 'series-item' + (activeSeries === s.id ? ' active' : '');
     item.innerHTML = `
       <button class="series-item-btn" onclick="selectSeries('${s.id}')">
         <span class="series-name">${s.name}</span>
         <span class="series-meta">${s.years || ''}</span>
+        <div class="series-progress"><div class="series-progress-fill" style="width:${total?Math.round(owned/total*100):0}%"></div></div>
       </button>
-      <span class="series-count">${count}</span>
+      <span class="series-count">${owned}/${total}</span>
       <button class="series-del" onclick="deleteSeries('${s.id}')" title="${t('del_series_title')}">✕</button>`;
     list.appendChild(item);
   });

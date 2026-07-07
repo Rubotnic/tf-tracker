@@ -53,6 +53,7 @@ def init_db():
             value       REAL DEFAULT 0,
             notes       TEXT DEFAULT '',
             owned       INTEGER DEFAULT 0,
+            wishlist    INTEGER DEFAULT 0,
             created_at  TEXT DEFAULT (datetime('now'))
         );
 
@@ -111,6 +112,7 @@ def init_db():
         "ALTER TABLE robots ADD COLUMN value REAL DEFAULT 0",
         "ALTER TABLE robots ADD COLUMN notes TEXT DEFAULT ''",
         "ALTER TABLE robots ADD COLUMN owned INTEGER DEFAULT 0",
+        "ALTER TABLE robots ADD COLUMN wishlist INTEGER DEFAULT 0",
     ]:
         try: db.execute(sql)
         except: pass
@@ -131,7 +133,8 @@ def serve_image(filename):
 @app.route('/api/series', methods=['GET'])
 def get_series():
     rows = get_db().execute("""
-        SELECT s.*, COUNT(r.id) as robot_count
+        SELECT s.*, COUNT(r.id) as robot_count,
+               COALESCE(SUM(CASE WHEN r.owned=1 THEN 1 ELSE 0 END), 0) as owned_count
         FROM series s
         LEFT JOIN robots r ON r.series_id = s.id
         GROUP BY s.id
@@ -225,6 +228,9 @@ def update_robot(rid):
          (1 if d['owned'] else 0) if 'owned' in d else cur['owned'],
          rid)
     )
+    if 'wishlist' in d:
+        get_db().execute("UPDATE robots SET wishlist=? WHERE id=?", (1 if d['wishlist'] else 0, rid)
+    )
     get_db().commit()
     return jsonify({'ok': True})
 
@@ -241,9 +247,37 @@ def delete_robot(rid):
 @app.route('/api/robots/<rid>/owned', methods=['PATCH'])
 def toggle_owned(rid):
     d = request.json
-    get_db().execute("UPDATE robots SET owned=? WHERE id=?", (1 if d.get('owned') else 0, rid))
+    owned = 1 if d.get('owned') else 0
+    if owned:
+        # Ägd figur behöver inte önskas längre
+        get_db().execute("UPDATE robots SET owned=1, wishlist=0 WHERE id=?", (rid,))
+    else:
+        get_db().execute("UPDATE robots SET owned=0 WHERE id=?", (rid,))
     get_db().commit()
     return jsonify({'ok': True})
+
+@app.route('/api/robots/<rid>/wishlist', methods=['PATCH'])
+def toggle_wishlist(rid):
+    d = request.json
+    get_db().execute("UPDATE robots SET wishlist=? WHERE id=?", (1 if d.get('wishlist') else 0, rid))
+    get_db().commit()
+    return jsonify({'ok': True})
+
+@app.route('/api/robots/bulk_owned', methods=['POST'])
+def bulk_owned():
+    d = request.json
+    ids = d.get('ids') or []
+    owned = 1 if d.get('owned') else 0
+    if not isinstance(ids, list) or not ids:
+        return jsonify({'error': 'Inga robotar angivna'}), 400
+    db = get_db()
+    ph = ','.join('?' * len(ids))
+    if owned:
+        db.execute(f"UPDATE robots SET owned=1, wishlist=0 WHERE id IN ({ph})", ids)
+    else:
+        db.execute(f"UPDATE robots SET owned=0 WHERE id IN ({ph})", ids)
+    db.commit()
+    return jsonify({'updated': len(ids)})
 
 @app.route('/api/robots/<rid>/open', methods=['PATCH'])
 def toggle_open(rid):
@@ -491,10 +525,10 @@ def export_csv():
         acc_map[a['robot_id']] = (a['tot'], a['have'])
     lang = request.args.get('lang', 'sv')
     if lang == 'en':
-        header = ['Series','Name','Category','Faction','Combiner','Instance','Owned','Value (kr)','Accessories total','Accessories have','Notes']
+        header = ['Series','Name','Category','Faction','Combiner','Instance','Owned','Wishlist','Value (kr)','Accessories total','Accessories have','Notes']
         yes, no = 'Yes', 'No'
     else:
-        header = ['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar']
+        header = ['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Onskelista','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar']
         yes, no = 'Ja', 'Nej'
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=';')
@@ -503,6 +537,7 @@ def export_csv():
         tot, have = acc_map.get(r['id'], (0, 0))
         w.writerow([r['series_name'] or '', r['name'], r['category'] or '', (r['faction'] or '').capitalize(),
                     r['combiner'] or '', r['instance'] or '', yes if r['owned'] else no,
+                    yes if r['wishlist'] else no,
                     r['value'] or 0, tot, have or 0, r['notes'] or ''])
     from flask import Response
     safe = label.replace(' ', '_').replace('/', '-')

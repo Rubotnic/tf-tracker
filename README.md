@@ -16,6 +16,10 @@ Built for collectors who want full control of their data without cloud services 
 
 - **18 series** pre-loaded — G1 through Titans Return (2,400+ figures)
 - Mark figures as **owned** — separate your collection from the full catalog
+- **Completion bars** per series in the sidebar — see how far you've come (87/344)
+- **Statistics view** — collection value, completion per series, most valuable figures, faction split
+- **Bulk edit** — mark all filtered figures as owned in one click
+- **⭐ Wishlist** — star figures you're hunting, filter them out, export the list
 - Track accessories and parts per figure (have / missing)
 - Upload photos for each figure and accessory
 - Filter by faction (Autobot / Decepticon), status, type
@@ -25,6 +29,8 @@ Built for collectors who want full control of their data without cloud services 
 - PDF and CSV (Excel) export per series
 - One-click backup — downloads a zip with your database and all photos
 - Interface in **Swedish or English** — switch anytime with the EN/SV button
+- **Compact filter panel** — active filters show as removable tags, one click to clear
+- **Larger text mode** — scale up the whole interface with the A+ button
 - 100% local — no internet required after setup
 
 ---
