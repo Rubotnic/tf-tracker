@@ -220,6 +220,23 @@ header::after{
 }
 .filter-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold2,#FFB800);letter-spacing:2px;text-transform:uppercase;margin-right:4px;padding-left:8px;border-left:2px solid var(--red2,#FF3300);line-height:1.4;}
 .filter-group{display:flex;gap:3px;align-items:center;}
+.export-wrap{position:relative;}
+.export-menu{display:none;position:absolute;top:calc(100% + 4px);right:0;z-index:200;
+  background:#0A0A14;border:1px solid var(--border2);border-top:2px solid var(--gold);
+  border-radius:3px;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,.6);padding:4px;}
+.export-menu.open{display:block;}
+.export-menu button{display:block;width:100%;text-align:left;background:transparent;border:none;
+  color:var(--text);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;
+  padding:8px 10px;cursor:pointer;border-radius:2px;transition:all .15s;}
+.export-menu button:hover{background:rgba(255,51,0,.1);color:var(--red2,#FF3300);}
+#toastWrap{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+.toast{background:#0A0A14;border:1px solid var(--green2,#00C850);border-left:3px solid var(--green2,#00C850);
+  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;
+  padding:10px 16px;border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,.6);
+  animation:toastIn .25s ease-out;max-width:320px;}
+.toast.out{animation:toastOut .3s ease-in forwards;}
+@keyframes toastIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes toastOut{to{transform:translateX(30px);opacity:0}}
 #filterToolbar{display:flex;align-items:center;gap:8px;padding:8px 16px;flex-wrap:wrap;
   border-bottom:1px solid var(--border2);}
 #filterToggle{display:flex;align-items:center;gap:6px;background:transparent;
@@ -288,6 +305,11 @@ header::after{
   cursor:pointer;user-select:none;transition:background .15s;
 }
 .robot-header:hover{background:rgba(255,255,255,.02);}
+.robot-card.is-owned .robot-header{background:linear-gradient(90deg,rgba(0,200,80,.06),transparent 45%);}
+.robot-card.not-owned .robot-name{opacity:.55;}
+.robot-card.not-owned .robot-thumb{opacity:.5;filter:grayscale(.4);}
+.robot-card.not-owned:hover .robot-name{opacity:.85;}
+.robot-card.not-owned:hover .robot-thumb{opacity:.8;filter:grayscale(0);}
 .robot-thumb{
   width:48px;height:48px;flex-shrink:0;border-radius:2px;
   background:var(--surface);overflow:hidden;
@@ -338,6 +360,11 @@ header::after{
 .del-robot:hover{color:var(--red2);}
 .chevron{font-size:8px;color:var(--muted);transition:transform .25s,color .25s;flex-shrink:0;font-family:'Share Tech Mono',monospace;}
 .robot-card.open .chevron{transform:rotate(180deg);color:var(--gold);}
+@media (hover:hover){
+  .robot-header .edit-robot,.robot-header .del-robot{opacity:0;transition:opacity .15s;}
+  .robot-card:hover .edit-robot,.robot-card:hover .del-robot,
+  .robot-header .edit-robot:focus-visible,.robot-header .del-robot:focus-visible{opacity:1;}
+}
 
 /* ── ACCESSORIES ────────────────────────────────────────────────────────── */
 .accessories{display:none;padding:10px 12px;border-top:1px solid var(--border);background:rgba(4,4,12,.6);}
@@ -491,9 +518,14 @@ input[type=file]{display:none;}
     <span class="s-icon">▶</span>
   </div>
   <button class="btn-primary" onclick="openModal()" data-i18n="btn_add">+ LÄGG TILL</button>
-  <button class="btn-secondary" id="pdfBtn" onclick="exportPdf()">⬇ PDF</button>
-  <button class="btn-secondary" onclick="exportCsv()" data-i18n-title="csv_title" title="Exportera aktuell serie som CSV (Excel)">⬇ CSV</button>
-  <button class="btn-secondary" onclick="window.location='/api/backup'" data-i18n-title="backup_title" title="Ladda ner backup av hela samlingen">💾 BACKUP</button>
+  <div class="export-wrap">
+    <button class="btn-secondary" id="exportBtn" onclick="toggleExportMenu(event)"><span data-i18n="export_btn">EXPORT</span> <span style="font-size:8px">▾</span></button>
+    <div class="export-menu" id="exportMenu">
+      <button onclick="closeExportMenu();exportPdf()">⬇ PDF</button>
+      <button onclick="closeExportMenu();exportCsv()">⬇ CSV (Excel)</button>
+      <button onclick="closeExportMenu();doBackup()">💾 <span data-i18n="backup_item">BACKUP (zip)</span></button>
+    </div>
+  </div>
   <button class="btn-secondary" onclick="openStats()" data-i18n-title="stats_title_btn" title="Visa statistik">📊</button>
   <button class="btn-secondary" id="fontBtn" onclick="toggleFontSize()" title="Större text" style="min-width:38px">A+</button>
   <button class="btn-secondary" id="langBtn" onclick="toggleLang()" title="Byt språk / Switch language" style="min-width:38px">EN</button>
@@ -790,9 +822,9 @@ sv: {
   hr12:"<b>Bocka av</b> – minus minskar, plus ökar. Grönt = du har det.",
   hr13:"<b>Combiner-del</b> – lila streckad = tillhör kombinationsformen.",
   hr14:"<b>Ta bort</b> – hovra, klicka röda krysset uppe till höger.",
-  hr15:"<b>PDF/CSV</b> – exporterar aktuell serie som PDF eller CSV (öppnas i Excel).",
+  hr15:"<b>EXPORT-menyn</b> – PDF och CSV (Excel) för aktuell serie, samt BACKUP.",
   hr16:"<b>ÄGER</b> – markera figurer du äger. Samlingsvärdet räknas bara på ägda figurer.",
-  hr17:"<b>BACKUP</b> – laddar ner en zip med databas + alla bilder. Spara den säkert!",
+  hr17:"<b>BACKUP</b> (i EXPORT-menyn) – laddar ner en zip med databas + alla bilder. Spara den säkert!",
   hr18:"<b>EN/SV</b> – byter språk mellan svenska och engelska. Valet sparas.",
   hr19:"<b>⏻ Stäng av</b> – stänger av appen helt. Starta igen med genvägen.",
   hr20:"<b>📊 Statistik</b> – översikt av samlingen: värde, komplettering per serie, toppfigurer.",
@@ -811,6 +843,10 @@ sv: {
   autobots:"Autobots", decepticons:"Decepticons", others:"Övriga",
   filters_btn:"FILTER", clear:"RENSA ALLA",
   font_on:"Större text", font_off:"Normal textstorlek",
+  export_btn:"EXPORT", backup_item:"BACKUP (zip)",
+  toast_saved:"✓ Sparad", toast_added:"✓ {name} tillagd", toast_deleted:"Borttagen",
+  toast_bulk_own:"✓ {n} robotar markerade som ägda", toast_bulk_unown:"✓ {n} robotar avmarkerade",
+  toast_backup:"✓ Backup laddas ner...", toast_series:"✓ Serie sparad",
   hr24:"<b>A+</b> – växlar till större text i hela appen. Valet sparas.",
   fv_autobot:"AUTOBOTS", fv_decepticon:"DECEPTICONS",
   hr23:"<b>FILTER-knappen</b> – öppnar filterpanelen. Aktiva filter visas som röda taggar – klicka på en tagg för att ta bort den."
@@ -856,9 +892,9 @@ en: {
   hr12:"<b>Check off</b> – minus decreases, plus increases. Green = you have it.",
   hr13:"<b>Combiner part</b> – purple dashed = belongs to the combined form.",
   hr14:"<b>Delete</b> – hover, click the red cross in the top right.",
-  hr15:"<b>PDF/CSV</b> – exports the current series as PDF or CSV (opens in Excel).",
+  hr15:"<b>EXPORT menu</b> – PDF and CSV (Excel) for the current series, plus BACKUP.",
   hr16:"<b>OWNED</b> – mark figures you own. Collection value only counts owned figures.",
-  hr17:"<b>BACKUP</b> – downloads a zip with the database + all photos. Keep it safe!",
+  hr17:"<b>BACKUP</b> (in the EXPORT menu) – downloads a zip with the database + all photos. Keep it safe!",
   hr18:"<b>EN/SV</b> – switches between Swedish and English. Your choice is saved.",
   hr19:"<b>⏻ Shut down</b> – closes the app completely. Start again with the shortcut.",
   hr20:"<b>📊 Statistics</b> – collection overview: value, completion per series, top figures.",
@@ -877,6 +913,10 @@ en: {
   autobots:"Autobots", decepticons:"Decepticons", others:"Other",
   filters_btn:"FILTERS", clear:"CLEAR ALL",
   font_on:"Larger text", font_off:"Normal text size",
+  export_btn:"EXPORT", backup_item:"BACKUP (zip)",
+  toast_saved:"✓ Saved", toast_added:"✓ {name} added", toast_deleted:"Deleted",
+  toast_bulk_own:"✓ {n} robots marked as owned", toast_bulk_unown:"✓ {n} robots unmarked",
+  toast_backup:"✓ Backup downloading...", toast_series:"✓ Series saved",
   hr24:"<b>A+</b> – switches the whole app to larger text. Your choice is saved.",
   fv_autobot:"AUTOBOTS", fv_decepticon:"DECEPTICONS",
   hr23:"<b>FILTERS button</b> – opens the filter panel. Active filters show as red tags – click a tag to remove it."
@@ -949,6 +989,34 @@ function setFilter(type, value, btn) {
   btn.classList.add('active');
   updateFilterUI();
   render();
+}
+
+function showToast(msg) {
+  let wrap = document.getElementById('toastWrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'toastWrap';
+    document.body.appendChild(wrap);
+  }
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2600);
+}
+
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  document.getElementById('exportMenu').classList.toggle('open');
+}
+function closeExportMenu() {
+  document.getElementById('exportMenu').classList.remove('open');
+}
+document.addEventListener('click', () => closeExportMenu());
+
+function doBackup() {
+  window.location = '/api/backup';
+  showToast(t('toast_backup'));
 }
 
 function toggleFilterPanel() {
@@ -1082,7 +1150,7 @@ function render() {
     const inst = robot.instance ? ` <span style="color:var(--muted);font-size:12px;font-family:'Share Tech Mono',monospace">#${robot.instance}</span>` : '';
 
     const card = document.createElement('div');
-    card.className = 'robot-card' + (robot.open?' open':'');
+    card.className = 'robot-card' + (robot.open?' open':'') + (robot.owned?' is-owned':' not-owned');
     card.dataset.id = robot.id;
     if(factionColor) card.style.borderLeft = `3px solid ${factionColor}`;
 
@@ -1192,6 +1260,7 @@ async function bulkOwned(owned) {
   targets.forEach(r => { r.owned = owned ? 1 : 0; if (owned) r.wishlist = 0; });
   await refreshSeries();
   render();
+  showToast(t(owned ? 'toast_bulk_own' : 'toast_bulk_unown').replace('{n}', targets.length));
 }
 
 async function openStats() {
@@ -1547,6 +1616,7 @@ async function saveSeries() {
     if (res && res.error) { alert(res.error); return; }
   }
   closeSeriesModal();
+  showToast(t('toast_series'));
   allSeries = await api('GET', '/api/series');
   renderSidebar();
   populateSeriesSelects();
@@ -1587,6 +1657,7 @@ addRobot = async function() {
     owned: document.getElementById('mOwned').checked
   });
   closeModal();
+  showToast(t('toast_added').replace('{name}', name));
   [allSeries, robots] = await Promise.all([
     api('GET', '/api/series'),
     api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`)
@@ -1612,6 +1683,7 @@ saveRobot = async function() {
     owned: document.getElementById('eOwned').checked
   });
   closeEditModal();
+  showToast(t('toast_saved'));
   [allSeries, robots] = await Promise.all([
     api('GET', '/api/series'),
     api('GET', activeSeries === 'all' ? '/api/robots' : `/api/robots?series_id=${activeSeries}`)
@@ -1668,6 +1740,7 @@ deleteRobot = async function(rid) {
   ]);
   renderSidebar();
   render();
+  showToast(t('toast_deleted'));
 };
 </script>
 </body>
