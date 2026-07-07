@@ -14,12 +14,16 @@ Built for collectors who want full control of their data without cloud services 
 
 ## Features
 
-- **18 series** pre-loaded — G1 through Titans Return (2,600+ figures)
+- **18 series** pre-loaded — G1 through Titans Return (2,400+ figures)
+- Mark figures as **owned** — separate your collection from the full catalog
 - Track accessories and parts per figure (have / missing)
 - Upload photos for each figure and accessory
 - Filter by faction (Autobot / Decepticon), status, type
+- Set an estimated value per figure — see your collection's total value (owned figures only)
+- Personal notes per figure (purchase info, condition, missing parts...)
 - Sidebar navigation between collections
-- PDF export per series
+- PDF and CSV (Excel) export per series
+- One-click backup — downloads a zip with your database and all photos
 - 100% local — no internet required after setup
 
 ---
@@ -83,7 +87,7 @@ All your collection data is stored locally on your computer — nothing is sent 
 | All figures, accessories, status | `tracker.db` |
 | All uploaded photos | `images/` folder |
 
-> **Backup tip:** Copy both `tracker.db` and the `images/` folder to keep your collection safe.
+> **Backup tip:** Click the **💾 BACKUP** button in the app — it downloads a zip with your database and all photos. You can also copy `tracker.db` and the `images/` folder manually.
 
 > If you ever delete `tracker.db` by mistake, run `python seed.py` to recreate it with all figures.
 
@@ -103,7 +107,7 @@ All your collection data is stored locally on your computer — nothing is sent 
 | Cybertron | CYB | 2005–2006 | 118 |
 | Movie (2007) | MOV1 | 2007–2008 | 194 |
 | Animated | ANI | 2008–2010 | 88 |
-| Movie – ROTF | ROTF | 2007–2010 | 213 |
+| Movie – ROTF | ROTF | 2007–2010 | 237 |
 | Movie – DOTM | DOTM | 2011–2012 | 154 |
 | Prime | PRI | 2011–2020 | 166 |
 | Movie – AOE | AOE | 2013–2014 | 87 |

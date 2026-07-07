@@ -52,6 +52,7 @@ def init_db():
             series_id   TEXT REFERENCES series(id),
             value       REAL DEFAULT 0,
             notes       TEXT DEFAULT '',
+            owned       INTEGER DEFAULT 0,
             created_at  TEXT DEFAULT (datetime('now'))
         );
 
@@ -109,6 +110,7 @@ def init_db():
         "ALTER TABLE robots ADD COLUMN faction TEXT DEFAULT ''",
         "ALTER TABLE robots ADD COLUMN value REAL DEFAULT 0",
         "ALTER TABLE robots ADD COLUMN notes TEXT DEFAULT ''",
+        "ALTER TABLE robots ADD COLUMN owned INTEGER DEFAULT 0",
     ]:
         try: db.execute(sql)
         except: pass
@@ -198,10 +200,10 @@ def add_robot():
     rid = str(uuid.uuid4())
     max_order = get_db().execute("SELECT COALESCE(MAX(sort_order),0) FROM robots").fetchone()[0]
     get_db().execute(
-        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO robots (id,name,category,combiner,instance,sort_order,faction,series_id,value,notes,owned) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         (rid, d['name'], d.get('category',''), d.get('combiner',''),
          d.get('instance',''), max_order+1, d.get('faction',''), d.get('series_id'),
-         d.get('value', 0) or 0, d.get('notes', ''))
+         d.get('value', 0) or 0, d.get('notes', ''), 1 if d.get('owned') else 0)
     )
     get_db().commit()
     return jsonify({'id': rid})
@@ -210,10 +212,10 @@ def add_robot():
 def update_robot(rid):
     d = request.json
     get_db().execute(
-        "UPDATE robots SET name=?, category=?, combiner=?, instance=?, faction=?, series_id=?, value=?, notes=? WHERE id=?",
+        "UPDATE robots SET name=?, category=?, combiner=?, instance=?, faction=?, series_id=?, value=?, notes=?, owned=? WHERE id=?",
         (d['name'], d.get('category',''), d.get('combiner',''),
          d.get('instance',''), d.get('faction',''), d.get('series_id'),
-         d.get('value', 0), d.get('notes', ''), rid)
+         d.get('value', 0), d.get('notes', ''), 1 if d.get('owned') else 0, rid)
     )
     get_db().commit()
     return jsonify({'ok': True})
@@ -225,6 +227,13 @@ def delete_robot(rid):
         path = os.path.join(IMG_DIR, row['img_file'])
         if os.path.exists(path): os.remove(path)
     get_db().execute("DELETE FROM robots WHERE id=?", (rid,))
+    get_db().commit()
+    return jsonify({'ok': True})
+
+@app.route('/api/robots/<rid>/owned', methods=['PATCH'])
+def toggle_owned(rid):
+    d = request.json
+    get_db().execute("UPDATE robots SET owned=? WHERE id=?", (1 if d.get('owned') else 0, rid))
     get_db().commit()
     return jsonify({'ok': True})
 
@@ -425,6 +434,63 @@ def export_pdf():
     safe = series_label.replace(' ', '_').replace('/', '-')
     return Response(buf.read(), mimetype='application/pdf',
         headers={'Content-Disposition': f'attachment; filename=tf_{safe}.pdf'})
+
+@app.route('/api/backup')
+def backup():
+    import zipfile, io, tempfile, datetime
+    buf = io.BytesIO()
+    # Säker DB-kopia via SQLites backup-API (hanterar WAL korrekt)
+    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as tmp:
+        tmp_path = tmp.name
+    try:
+        src = sqlite3.connect(DB_PATH)
+        dst = sqlite3.connect(tmp_path)
+        src.backup(dst)
+        dst.close(); src.close()
+        with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
+            z.write(tmp_path, 'tracker.db')
+            if os.path.isdir(IMG_DIR):
+                for fn in os.listdir(IMG_DIR):
+                    z.write(os.path.join(IMG_DIR, fn), f'images/{fn}')
+    finally:
+        os.unlink(tmp_path)
+    buf.seek(0)
+    from flask import Response
+    stamp = datetime.date.today().strftime('%Y-%m-%d')
+    return Response(buf.read(), mimetype='application/zip',
+        headers={'Content-Disposition': f'attachment; filename=tf_tracker_backup_{stamp}.zip'})
+
+@app.route('/api/export/csv')
+def export_csv():
+    import csv, io, datetime
+    series_id = request.args.get('series_id')
+    db = get_db()
+    if series_id and series_id != 'all':
+        robots = db.execute("""SELECT r.*, s.name as series_name FROM robots r
+            LEFT JOIN series s ON r.series_id = s.id
+            WHERE r.series_id=? ORDER BY s.sort_order, r.sort_order""", (series_id,)).fetchall()
+        label = (db.execute("SELECT name FROM series WHERE id=?", (series_id,)).fetchone() or {'name':'export'})['name']
+    else:
+        robots = db.execute("""SELECT r.*, s.name as series_name FROM robots r
+            LEFT JOIN series s ON r.series_id = s.id
+            ORDER BY s.sort_order, r.sort_order""").fetchall()
+        label = 'alla_serier'
+    acc_map = {}
+    for a in db.execute("SELECT robot_id, COUNT(*) as tot, SUM(CASE WHEN have>0 THEN 1 ELSE 0 END) as have FROM accessories GROUP BY robot_id").fetchall():
+        acc_map[a['robot_id']] = (a['tot'], a['have'])
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=';')
+    w.writerow(['Serie','Namn','Kategori','Fraktion','Combiner','Exemplar','Ager','Varde (kr)','Tillbehor totalt','Tillbehor har','Noteringar'])
+    for r in robots:
+        tot, have = acc_map.get(r['id'], (0, 0))
+        w.writerow([r['series_name'] or '', r['name'], r['category'] or '', (r['faction'] or '').capitalize(),
+                    r['combiner'] or '', r['instance'] or '', 'Ja' if r['owned'] else 'Nej',
+                    r['value'] or 0, tot, have or 0, r['notes'] or ''])
+    from flask import Response
+    safe = label.replace(' ', '_').replace('/', '-')
+    # utf-8-sig BOM så Excel visar svenska tecken korrekt
+    return Response('\ufeff' + buf.getvalue(), mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': f'attachment; filename=tf_{safe}.csv'})
 
 @app.route('/api/shutdown', methods=['POST'])
 def shutdown():
