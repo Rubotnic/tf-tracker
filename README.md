@@ -24,6 +24,7 @@ Built for collectors who want full control of their data without cloud services 
 - Sidebar navigation between collections
 - PDF and CSV (Excel) export per series
 - One-click backup — downloads a zip with your database and all photos
+- Interface in **Swedish or English** — switch anytime with the EN/SV button
 - 100% local — no internet required after setup
 
 ---
